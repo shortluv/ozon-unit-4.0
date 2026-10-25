@@ -15,7 +15,7 @@
   "rewrites": [
     {
       "source": "/api/ozon/:path*",
-      "destination": "https://api-seller.ozon.ru/:path*"
+      "destination": "/api/ozon?path=:path*"
     },
     {
       "source": "/((?!api/).*)",
