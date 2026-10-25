@@ -9,6 +9,7 @@ import { DEMO_OZON_LIVE_CATALOG, getSavedOzonCredentials } from './services/ozon
 import { MARKETPLACE_PRESETS } from './utils/calculator';
 import { exportProductsToExcel } from './utils/excelHelper';
 import { recordPriceSnapshot, recordPriceSnapshotsBatch } from './services/priceHistoryService';
+import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { MetricsOverview } from './components/MetricsOverview';
 import { ProductTable } from './components/ProductTable';
@@ -45,10 +46,11 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<ProductUnitData | null>(null);
 
-  // Modals
+  // Modals & Mobile drawer
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isNewProductOpen, setIsNewProductOpen] = useState(false);
   const [isOzonSyncOpen, setIsOzonSyncOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Saved credentials status
   const [isOzonConnected, setIsOzonConnected] = useState(false);
@@ -179,9 +181,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b13] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
-      {/* Top Header */}
-      <Header
+    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-row font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
+      {/* Mercury Left Navigation Sidebar */}
+      <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenImport={() => setIsImportOpen(true)}
@@ -190,98 +192,117 @@ export default function App() {
         onOpenOzonSync={() => setIsOzonSyncOpen(true)}
         isOzonConnected={isOzonConnected}
         productCount={products.length}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* KPI Metrics Strip (visible on catalog, single, advisor) */}
-        {activeTab !== 'live_analytics' && (
-          <MetricsOverview
-            products={products}
-            onFilterLosses={() => setActiveFilter(activeFilter === 'loss' ? 'all' : 'loss')}
-            activeFilter={activeFilter}
-          />
-        )}
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen bg-[#090d16]">
+        {/* Mercury TopBar */}
+        <Header
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onOpenImport={() => setIsImportOpen(true)}
+          onExport={handleExport}
+          onNewProduct={() => setIsNewProductOpen(true)}
+          onOpenOzonSync={() => setIsOzonSyncOpen(true)}
+          isOzonConnected={isOzonConnected}
+          productCount={products.length}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+        />
 
-        {/* Tab 1: Interactive Table & Widgets */}
-        {activeTab === 'catalog' && (
-          <div className="space-y-4">
-            {/* ЭТАП 2: Честный информационный баннер источников данных (исправлен по результатам аудита) */}
-            <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-                    Честный аудит источников данных и логики расчета Ozon
-                  </span>
-                </div>
-                <p className="text-slate-300 leading-relaxed text-[11px]">
-                  Данные о товарах, ценах (min_price), габаритах, складах и тарифах категорий загружаются из{' '}
-                  <strong className="text-emerald-400 font-medium">Ozon Seller API</strong>. Себестоимость закупки и плановый ДРР задаются селлером. Логистика, комиссионная ступень 300 ₽ и налоги рассчитываются по регламенту Ozon 2025/2026 и формулам юнит-экономики. Источник и актуальность каждого показателя отображаются отдельно.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
-                <button
-                  onClick={() => setIsOzonSyncOpen(true)}
-                  className="px-3 py-1.5 text-[11px] font-medium text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>Синхронизация API</span>
-                </button>
-              </div>
-            </div>
-
-            <ProductTable
+        {/* Content Viewport */}
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+          {/* KPI Metrics Strip (visible on catalog, single, advisor) */}
+          {activeTab !== 'live_analytics' && (
+            <MetricsOverview
               products={products}
-              onUpdateProduct={handleUpdateProduct}
-              onDeleteProduct={handleDeleteProduct}
-              onDuplicateProduct={handleDuplicateProduct}
-              onSelectForDeepDive={handleSelectForDeepDive}
-              onApplyPresetToAll={handleApplyPresetToAll}
-              onUpdateWarehouseAll={handleUpdateWarehouseAll}
+              onFilterLosses={() => setActiveFilter(activeFilter === 'loss' ? 'all' : 'loss')}
               activeFilter={activeFilter}
-              setActiveFilter={setActiveFilter}
             />
-          </div>
-        )}
+          )}
 
-        {/* Tab 2: НОВАЯ ВКЛАДКА «ЖИВАЯ АНАЛИТИКА» (ЭТАПЫ 4, 5, 6, 7) */}
-        {activeTab === 'live_analytics' && (
-          <LiveAnalytics
-            products={products}
-            onOpenOzonSync={() => setIsOzonSyncOpen(true)}
-            isOzonConnected={isOzonConnected}
-            onSelectProductForDeepDive={handleSelectForDeepDive}
-          />
-        )}
+          {/* Tab 1: Interactive Table & Widgets */}
+          {activeTab === 'catalog' && (
+            <div className="space-y-4">
+              {/* Информационный баннер источников данных Ozon (Mercury style) */}
+              <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="font-semibold text-white uppercase tracking-wider text-[11px] font-mono">
+                      Аудит источников данных и логики расчета Ozon
+                    </span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed text-[11px]">
+                    Данные о товарах, ценах (min_price), габаритах, складах и тарифах категорий загружаются из{' '}
+                    <strong className="text-indigo-400 font-medium">Ozon Seller API</strong>. Себестоимость закупки и плановый ДРР задаются селлером. Логистика, комиссионная ступень 300 ₽ и налоги рассчитываются по регламенту Ozon 2025/2026 и формулам юнит-экономики.
+                  </p>
+                </div>
 
-        {/* Tab 3: Single Product Deep Dive Calculator */}
-        {activeTab === 'single' && (
-          <SingleCalculator
-            products={products}
-            selectedProduct={selectedProduct}
-            onSaveProduct={handleUpdateProduct}
-            onSaveAsNew={handleAddProduct}
-          />
-        )}
+                <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+                  <button
+                    onClick={() => setIsOzonSyncOpen(true)}
+                    className="px-3 py-1.5 text-[11px] font-medium text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    <RefreshCw className="w-3 h-3 text-indigo-400" />
+                    <span>Синхронизация API</span>
+                  </button>
+                </div>
+              </div>
 
-        {/* Tab 4: Sensitivity Matrix */}
-        {activeTab === 'matrix' && (
-          <SensitivityMatrix
-            products={products}
-            selectedProduct={selectedProduct}
-          />
-        )}
+              <ProductTable
+                products={products}
+                onUpdateProduct={handleUpdateProduct}
+                onDeleteProduct={handleDeleteProduct}
+                onDuplicateProduct={handleDuplicateProduct}
+                onSelectForDeepDive={handleSelectForDeepDive}
+                onApplyPresetToAll={handleApplyPresetToAll}
+                onUpdateWarehouseAll={handleUpdateWarehouseAll}
+                activeFilter={activeFilter}
+                setActiveFilter={setActiveFilter}
+                onExport={handleExport}
+              />
+            </div>
+          )}
 
-        {/* Tab 5: AI & Algorithmic Unit Economics Advisor */}
-        {activeTab === 'advisor' && (
-          <EconomicsAdvisor
-            products={products}
-            onSelectProduct={handleSelectForDeepDive}
-          />
-        )}
-      </main>
+          {/* Tab 2: Живая аналитика */}
+          {activeTab === 'live_analytics' && (
+            <LiveAnalytics
+              products={products}
+              onOpenOzonSync={() => setIsOzonSyncOpen(true)}
+              isOzonConnected={isOzonConnected}
+              onSelectProductForDeepDive={handleSelectForDeepDive}
+            />
+          )}
+
+          {/* Tab 3: Single Product Deep Dive Calculator */}
+          {activeTab === 'single' && (
+            <SingleCalculator
+              products={products}
+              selectedProduct={selectedProduct}
+              onSaveProduct={handleUpdateProduct}
+              onSaveAsNew={handleAddProduct}
+            />
+          )}
+
+          {/* Tab 4: Sensitivity Matrix */}
+          {activeTab === 'matrix' && (
+            <SensitivityMatrix
+              products={products}
+              selectedProduct={selectedProduct}
+            />
+          )}
+
+          {/* Tab 5: AI & Algorithmic Unit Economics Advisor */}
+          {activeTab === 'advisor' && (
+            <EconomicsAdvisor
+              products={products}
+              onSelectProduct={handleSelectForDeepDive}
+            />
+          )}
+        </main>
+      </div>
 
       {/* Modals */}
       <OzonSyncModal

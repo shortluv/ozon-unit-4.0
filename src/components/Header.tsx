@@ -1,5 +1,17 @@
 import React from 'react';
-import { Calculator, Table2, Grid3X3, Lightbulb, Upload, Download, Plus, Layers, RefreshCw, Activity } from 'lucide-react';
+import {
+  Menu,
+  RefreshCw,
+  Upload,
+  Download,
+  Plus,
+  Search,
+  Sparkles,
+  ShieldCheck,
+  ChevronRight,
+  Layers,
+  ArrowUpRight,
+} from 'lucide-react';
 
 interface HeaderProps {
   activeTab: 'catalog' | 'live_analytics' | 'single' | 'matrix' | 'advisor';
@@ -10,6 +22,9 @@ interface HeaderProps {
   onOpenOzonSync: () => void;
   isOzonConnected?: boolean;
   productCount: number;
+  onOpenMobileMenu?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (val: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,137 +36,114 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenOzonSync,
   isOzonConnected,
   productCount,
+  onOpenMobileMenu,
+  searchQuery = '',
+  onSearchChange,
 }) => {
+  const titles = {
+    catalog: {
+      breadcrumb: 'Каталог товаров',
+      subtitle: 'Юнит-экономика, пороги комиссий и чистая прибыль',
+    },
+    live_analytics: {
+      breadcrumb: 'Живая аналитика',
+      subtitle: 'Динамика цен, маржи и синхронизация с Ozon API',
+    },
+    single: {
+      breadcrumb: 'Калькулятор позиции',
+      subtitle: 'Пошаговый расчет и декомпозиция затрат на 1 товар',
+    },
+    matrix: {
+      breadcrumb: 'Матрица «Что, если?»',
+      subtitle: 'Стресс-тестирование маржинальности при колебаниях цен',
+    },
+    advisor: {
+      breadcrumb: 'AI-Аудит и советы',
+      subtitle: 'Алгоритмический аудит ассортимента и предупреждение убытков',
+    },
+  };
+
+  const current = titles[activeTab] || titles.catalog;
+
   return (
-    <header className="sticky top-0 z-40 bg-[#080b11]/85 backdrop-blur-xl border-b border-white/[0.08] transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-8 h-16">
-          {/* Zone 1: Single clean brand wordmark (Uptic style) */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/25 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-              <Layers className="w-4 h-4 text-emerald-400 stroke-[2.2]" />
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold tracking-tight text-white whitespace-nowrap font-sans">
-                ЮнитЭкономика
-              </span>
-              <span className="text-[10px] uppercase font-mono tracking-wider px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.08] text-slate-400">
-                PRO
-              </span>
+    <header className="sticky top-0 z-20 bg-[#090d16]/85 backdrop-blur-xl border-b border-white/[0.07] transition-all">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-4 h-16">
+          {/* Left Zone: Mobile Menu Toggle + Breadcrumbs */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Mobile Hamburger */}
+            <button
+              onClick={onOpenMobileMenu}
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+              aria-label="Открыть меню"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Breadcrumb Trail (Mercury Standard) */}
+            <div className="flex items-center gap-2 text-xs text-slate-400 truncate">
+              <span className="text-slate-500 hidden sm:inline">Дашборд</span>
+              <ChevronRight className="w-3.5 h-3.5 text-slate-600 hidden sm:inline" />
+              <h1 className="font-semibold text-white text-sm sm:text-base tracking-tight truncate">
+                {current.breadcrumb}
+              </h1>
+              {activeTab === 'catalog' && (
+                <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono bg-white/[0.05] border border-white/[0.08] text-slate-300 ml-1">
+                  {productCount} SKU
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Zone 2: Refined segmented navigation */}
-          <nav className="hidden md:flex items-center gap-1 p-1 bg-[#0e1420]/70 border border-white/[0.06] rounded-xl">
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                activeTab === 'catalog'
-                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.1]'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
-              }`}
-            >
-              <Table2 className="w-3.5 h-3.5" />
-              <span>Таблица позиций</span>
-              <span className="font-mono text-[11px] px-1.5 py-0.2 rounded bg-white/[0.06] text-slate-300">
-                {productCount}
-              </span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('live_analytics')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                activeTab === 'live_analytics'
-                  ? 'bg-emerald-500/15 text-emerald-300 shadow-sm border border-emerald-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
-              }`}
-            >
-              <Activity className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Живая аналитика</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            </button>
-
-            <button
-              onClick={() => setActiveTab('single')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                activeTab === 'single'
-                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.1]'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
-              }`}
-            >
-              <Calculator className="w-3.5 h-3.5" />
-              <span>Калькулятор 1 шт</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('matrix')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                activeTab === 'matrix'
-                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.1]'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
-              }`}
-            >
-              <Grid3X3 className="w-3.5 h-3.5" />
-              <span>Матрица «Что, если?»</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('advisor')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-                activeTab === 'advisor'
-                  ? 'bg-white/[0.08] text-white shadow-sm border border-white/[0.1]'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
-              }`}
-            >
-              <Lightbulb className="w-3.5 h-3.5" />
-              <span>Аудит и советы</span>
-            </button>
-          </nav>
-
-          {/* Zone 3: Primary Actions */}
+          {/* Right Zone: Mercury Actions (Sync, Import, Export, + New Product) */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Ozon Sync & Tariffs Button */}
             <button
               onClick={onOpenOzonSync}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer shadow-sm border ${
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-all border cursor-pointer ${
                 isOzonConnected
-                  ? 'text-blue-300 bg-blue-500/15 hover:bg-blue-500/25 border-blue-500/35 shadow-[0_0_12px_rgba(59,130,246,0.2)]'
-                  : 'text-slate-300 bg-[#0e1420] hover:bg-[#151f32] border-white/[0.08] hover:border-white/[0.15]'
+                  ? 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.15)]'
+                  : 'bg-white/[0.03] hover:bg-white/[0.07] text-slate-300 border-white/[0.08]'
               }`}
-              title="Синхронизация с Ozon и актуальные тарифы логистики"
+              title="Синхронизация с Ozon Seller API"
             >
               <RefreshCw className="w-3.5 h-3.5 text-blue-400" />
-              <span className="hidden sm:inline">Ozon Тарифы</span>
-              {isOzonConnected ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              )}
+              <span className="hidden sm:inline">Ozon API</span>
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  isOzonConnected ? 'bg-emerald-400' : 'bg-blue-400 animate-pulse'
+                }`}
+              />
             </button>
 
+            {/* Import from Excel */}
             <button
               onClick={onOpenImport}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-[#0e1420] hover:bg-[#151f32] border border-white/[0.08] hover:border-white/[0.15] rounded-lg transition-all whitespace-nowrap cursor-pointer shadow-sm"
-              title="Загрузить таблицу Excel или CSV с юнит-экономикой"
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] rounded-lg transition-all cursor-pointer"
+              title="Загрузить Excel-файл с товарами"
             >
               <Upload className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Импорт Excel</span>
+              <span>Импорт</span>
             </button>
 
+            {/* Export to Excel */}
             <button
               onClick={onExport}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-[#0e1420] hover:bg-[#151f32] border border-white/[0.08] hover:border-white/[0.15] rounded-lg transition-all whitespace-nowrap cursor-pointer shadow-sm"
-              title="Выгрузить все расчеты в Excel файл"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] rounded-lg transition-all cursor-pointer"
+              title="Выгрузить юнит-экономику в Excel (.xlsx) с математическими формулами и динамическими расчётами"
             >
-              <Download className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Экспорт</span>
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Экспорт XLSX</span>
             </button>
 
+            {/* Primary Action Button: + Новый товар (Mercury Royal Indigo) */}
             <button
               onClick={onNewProduct}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] whitespace-nowrap cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-all shadow-[0_0_20px_rgba(79,70,229,0.25)] hover:shadow-[0_0_25px_rgba(79,70,229,0.4)] cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Новый товар</span>
+              <span className="hidden xs:inline">Добавить товар</span>
+              <span className="xs:hidden">Товар</span>
             </button>
           </div>
         </div>

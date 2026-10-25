@@ -7,7 +7,21 @@ export default defineConfig(() => {
   const ozonProxyConfig = {
     target: 'https://api-seller.ozon.ru',
     changeOrigin: true,
-    rewrite: (p: string) => p.replace(/^\/api\/ozon/, ''),
+    rewrite: (p: string) => {
+      // Поддержка как прямого пути /api/ozon/v3/product/list, так и запроса с параметром /api/ozon?path=v3/product/list
+      if (p.includes('path=')) {
+        const queryStart = p.indexOf('?');
+        const search = queryStart !== -1 ? p.slice(queryStart) : '';
+        const params = new URLSearchParams(search);
+        const queryPath = params.get('path');
+        if (queryPath) {
+          params.delete('path');
+          const remainingQuery = params.toString() ? `?${params.toString()}` : '';
+          return `/${queryPath.replace(/^\/+/, '')}${remainingQuery}`;
+        }
+      }
+      return p.replace(/^\/api\/ozon/, '');
+    },
     secure: true,
     configure: (proxy: any) => {
       proxy.on('proxyReq', (proxyReq: any, req: any) => {

@@ -20,7 +20,7 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
 
   if (!product) {
     return (
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-12 text-center text-slate-400">
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-12 text-center text-slate-400">
         Нет товаров для анализа. Добавьте товар в каталог.
       </div>
     );
@@ -34,12 +34,12 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
   const currentCalc = calculateUnitEconomics(product);
 
   return (
-    <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-6 space-y-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+    <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-6 space-y-6 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
       {/* Header and SKU selector */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
         <div>
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <Grid3X3 className="w-4 h-4 text-emerald-400" />
+          <h2 className="text-sm font-semibold text-white flex items-center gap-2 font-mono">
+            <Grid3X3 className="w-4 h-4 text-indigo-400" />
             <span>Матрица чувствительности «Что, если?»</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
@@ -53,7 +53,7 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
           <select
             value={activeProductId}
             onChange={(e) => setActiveProductId(e.target.value)}
-            className="text-xs font-semibold bg-[#080b11] border border-white/[0.08] text-white rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500/60 max-w-xs truncate cursor-pointer shadow-sm"
+            className="text-xs font-semibold bg-[#080c16] border border-white/[0.08] text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 max-w-xs truncate cursor-pointer shadow-sm"
           >
             {products.map((p) => (
               <option key={p.id} value={p.id}>
@@ -65,12 +65,12 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
       </div>
 
       {/* Baseline info showing the 4 primary inputs */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#080b11] p-4 rounded-xl border border-white/[0.06] text-xs">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#080c16] p-4 rounded-xl border border-white/[0.06] text-xs">
         <div>
           <span className="text-slate-400 block mb-1 flex items-center gap-1">
-            <Tag className="w-3.5 h-3.5 text-emerald-400" /> Предельная цена:
+            <Tag className="w-3.5 h-3.5 text-indigo-400" /> Предельная цена:
           </span>
-          <span className="font-mono tabular-nums font-bold text-emerald-300 text-sm">
+          <span className="font-mono tabular-nums font-bold text-indigo-300 text-sm">
             {formatCurrency(product.retailPrice)}
           </span>
         </div>
@@ -105,7 +105,7 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
         <table className="w-full text-center text-xs border-collapse">
           <thead>
             <tr>
-              <th className="py-3 px-3.5 text-left bg-[#080b11] border border-white/[0.06] text-slate-400 font-semibold whitespace-nowrap">
+              <th className="py-3 px-3.5 text-left bg-[#080c16] border border-white/[0.06] text-slate-400 font-semibold whitespace-nowrap">
                 Закупка \ Предельная цена
               </th>
               {priceDeltas.map((pDelta) => {
@@ -117,8 +117,8 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
                     key={pDelta}
                     className={`py-3 px-3 border border-white/[0.06] font-mono tabular-nums ${
                       isCurrent
-                        ? 'bg-emerald-500/20 text-emerald-300 font-bold border-emerald-500/40'
-                        : 'bg-[#080b11] text-slate-300 font-medium'
+                        ? 'bg-indigo-600/20 text-indigo-200 font-bold border-indigo-500/40'
+                        : 'bg-[#080c16] text-slate-300 font-medium'
                     }`}
                   >
                     <div className="text-white font-bold">{formatCurrency(simulatedPrice)}</div>
@@ -140,13 +140,13 @@ export const SensitivityMatrix: React.FC<SensitivityMatrixProps> = ({
                   <td
                     className={`py-3 px-3.5 text-left font-mono tabular-nums border border-white/[0.06] ${
                       isCurrentCost
-                        ? 'bg-emerald-500/10 text-emerald-300 font-bold border-emerald-500/30'
-                        : 'bg-[#080b11] text-slate-300 font-medium'
+                        ? 'bg-indigo-600/15 text-indigo-200 font-bold border-indigo-500/30'
+                        : 'bg-[#080c16] text-slate-300 font-medium'
                     }`}
                   >
-                    <div className="text-white font-semibold">{formatCurrency(simulatedCogs)}</div>
-                    <div className="text-[10px] text-slate-500 font-normal">
-                      {cDelta > 0 ? `+${cDelta * 100}% закупка` : cDelta < 0 ? `${cDelta * 100}% закупка` : 'Текущая себест.'}
+                    <div className="font-bold text-white">{simulatedCogs} ₽</div>
+                    <div className="text-[10px] text-slate-400">
+                      {cDelta > 0 ? `+${cDelta * 100}%` : cDelta === 0 ? 'текущая' : `${cDelta * 100}%`}
                     </div>
                   </td>
 

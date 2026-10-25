@@ -323,57 +323,463 @@ export function generateSampleTemplateExcel(): void {
   XLSX.writeFile(wb, 'Юнит_Экономика_Ozon_Шаблон.xlsx');
 }
 
-// Export calculated products with complete financial breakdown to Excel
+// Export calculated products with complete mathematical formulas and aesthetic styling to Excel
 export function exportProductsToExcel(products: ProductUnitData[]): void {
-  const exportRows = products.map((prod, index) => {
-    const calc: UnitEconomicsResult = calculateUnitEconomics(prod);
+  const list = Array.isArray(products) ? products : [];
+  const wb = XLSX.utils.book_new();
 
-    return {
-      '№': index + 1,
-      'Название товара': prod.title,
-      'Артикул': prod.sku,
-      'Штрихкод': prod.barcode || '',
-      'Склад': calc.warehouse,
-      
-      // 5 Изменяемых параметров пользователя
-      'Цена продажи предельная, ₽': calc.retailPrice,
-      'Цена для налога (база 11%), ₽': calc.taxPrice,
-      'Закупка / себест, ₽': calc.cogs,
-      'Литраж, л': prod.volumeLiters,
-      'Реклама, %': `${prod.adSpendPercent}%`,
-      
-      // Расходы
-      'Тариф лог, ₽': calc.baseLogisticsTariff,
-      'Посл. миля, ₽': Number(calc.lastMileRub.toFixed(2)),
-      'Эквайринг, ₽': Number(calc.acquiringRub.toFixed(2)),
-      'Кросс-док, ₽': Number(calc.crossDockRub.toFixed(2)),
-      'ДДВ, ₽': Number(calc.ddvRub.toFixed(2)),
-      'ЛП, ₽': Number(calc.lpRub.toFixed(2)),
-      'Логистика ИТОГО, ₽': Number(calc.totalLogisticsRub.toFixed(2)),
-      
-      'Комиссия Ozon, ₽': Number(calc.commissionRub.toFixed(2)),
-      'ФФ, ₽': calc.fulfillmentRub,
-      'Реклама, ₽': Number(calc.adSpendRub.toFixed(2)),
-      'Налог, ₽': Number(calc.taxRub.toFixed(2)),
-      'Форс-мажор, ₽': Number(calc.forceMajeureRub.toFixed(2)),
-      
-      // Итоговые результаты
-      'ИТОГО расходов, ₽': Number(calc.totalExpensesRub.toFixed(2)),
-      'ПРИБЫЛЬ ед, ₽': Number(calc.netProfitPerUnit.toFixed(2)),
-      'ROI %': `${calc.roiPercent.toFixed(1)}%`,
-      'Маржа %': `${calc.marginPercent.toFixed(1)}%`,
-      'Точка безубыточности, ₽': Number(calc.breakEvenPrice.toFixed(0)),
-      'Предельный % рекламы': `${calc.maxAllowableAdPercent.toFixed(1)}%`,
-      
-      'План продаж в мес (шт)': prod.plannedSalesUnits,
-      'Чистая прибыль в месяц (₽)': Number(calc.monthlyNetProfit.toFixed(0)),
+  // Column definitions: header title, width, alignment/type
+  const columnDefs = [
+    { key: 'num', title: '№', width: 6 },
+    { key: 'sku', title: 'Артикул Ozon', width: 18 },
+    { key: 'title', title: 'Название товара', width: 34 },
+    { key: 'category', title: 'Категория', width: 22 },
+    { key: 'warehouse', title: 'Склад отгрузки', width: 24 },
+    { key: 'liters', title: 'Литраж (л)', width: 13 },
+    { key: 'retailPrice', title: 'Предельная цена (₽)', width: 20 },
+    { key: 'taxPrice', title: 'База налога УСН (₽)', width: 20 },
+    { key: 'cogs', title: 'Себестоимость / Закупка (₽)', width: 22 },
+    { key: 'adSpendPercent', title: 'Реклама ДРР (%)', width: 16 },
+    { key: 'baseLogistics', title: 'Тариф логистики Ozon (₽)', width: 22 },
+    { key: 'lastMile', title: 'Последняя миля 4.9% (₽)', width: 20 },
+    { key: 'acquiring', title: 'Эквайринг 1.5% (₽)', width: 17 },
+    { key: 'crossDock', title: 'Кросс-докинг (₽)', width: 16 },
+    { key: 'ddv', title: 'ДДВ (доставка до ПВЗ) (₽)', width: 22 },
+    { key: 'lp', title: 'ЛП (локальность) (₽)', width: 18 },
+    { key: 'totalLogistics', title: 'ИТОГО логистика Ozon (₽)', width: 22 },
+    { key: 'commission', title: 'Комиссия Ozon (23%/52%) (₽)', width: 24 },
+    { key: 'fulfillment', title: 'Фулфилмент (ФФ) (₽)', width: 18 },
+    { key: 'adSpendRub', title: 'Расход на рекламу (₽)', width: 20 },
+    { key: 'taxRub', title: 'Налог УСН 11% (₽)', width: 18 },
+    { key: 'forceMajeure', title: 'Форс-мажор 1% (₽)', width: 17 },
+    { key: 'totalExpenses', title: 'ИТОГО ВСЕ РАСХОДЫ (₽)', width: 22 },
+    { key: 'netProfit', title: 'ЧИСТАЯ ПРИБЫЛЬ ЕД (₽)', width: 22 },
+    { key: 'margin', title: 'Маржинальность (%)', width: 17 },
+    { key: 'roi', title: 'ROI (%)', width: 15 },
+    { key: 'breakEven', title: 'Точка безубыточности (₽)', width: 22 },
+    { key: 'salesUnits', title: 'План продаж (шт/мес)', width: 20 },
+    { key: 'monthlyRevenue', title: 'Выручка в месяц (₽)', width: 22 },
+    { key: 'monthlyProfit', title: 'ЧИСТАЯ ПРИБЫЛЬ В МЕСЯЦ (₽)', width: 26 },
+  ];
+
+  const ws: any = {};
+  const totalCols = columnDefs.length;
+
+  // 1. Write Header Row (Row 0 in 0-indexed SheetJS, Row 1 in Excel)
+  columnDefs.forEach((col, c) => {
+    const cellRef = XLSX.utils.encode_cell({ c, r: 0 });
+    ws[cellRef] = {
+      t: 's',
+      v: col.title,
     };
   });
 
-  const ws = XLSX.utils.json_to_sheet(exportRows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'UNIT по товарам');
-  
+  // 2. Write Product Rows with active Excel formulas
+  list.forEach((prod, idx) => {
+    const r = idx + 1; // 0-indexed row (Row r+1 in Excel formula notation)
+    const excelRow = r + 1; // 1-indexed Excel row number
+    const calc: UnitEconomicsResult = calculateUnitEconomics(prod);
+
+    // Col letters mapping:
+    // A: num (0)
+    // B: sku (1)
+    // C: title (2)
+    // D: category (3)
+    // E: warehouse (4)
+    // F: liters (5)
+    // G: retailPrice (6)
+    // H: taxPrice (7)
+    // I: cogs (8)
+    // J: adSpendPercent (9)
+    // K: baseLogistics (10)
+    // L: lastMile (11)
+    // M: acquiring (12)
+    // N: crossDock (13)
+    // O: ddv (14)
+    // P: lp (15)
+    // Q: totalLogistics (16)
+    // R: commission (17)
+    // S: fulfillment (18)
+    // T: adSpendRub (19)
+    // U: taxRub (20)
+    // V: forceMajeure (21)
+    // W: totalExpenses (22)
+    // X: netProfit (23)
+    // Y: margin (24)
+    // Z: roi (25)
+    // AA: breakEven (26)
+    // AB: salesUnits (27)
+    // AC: monthlyRevenue (28)
+    // AD: monthlyProfit (29)
+
+    // Col A: №
+    ws[XLSX.utils.encode_cell({ c: 0, r })] = { t: 'n', v: idx + 1 };
+    
+    // Col B: SKU
+    ws[XLSX.utils.encode_cell({ c: 1, r })] = { t: 's', v: prod.sku };
+
+    // Col C: Title
+    ws[XLSX.utils.encode_cell({ c: 2, r })] = { t: 's', v: prod.title };
+
+    // Col D: Category
+    ws[XLSX.utils.encode_cell({ c: 3, r })] = { t: 's', v: prod.category || 'Красота и гигиена' };
+
+    // Col E: Warehouse
+    ws[XLSX.utils.encode_cell({ c: 4, r })] = { t: 's', v: calc.warehouse };
+
+    // Col F: Liters (E2 in formulas below if 1-indexed, but here col 5 = F)
+    ws[XLSX.utils.encode_cell({ c: 5, r })] = {
+      t: 'n',
+      v: prod.volumeLiters,
+      z: '0.00 "л"',
+    };
+
+    // Col G: Retail Price (Предельная цена продажи)
+    ws[XLSX.utils.encode_cell({ c: 6, r })] = {
+      t: 'n',
+      v: calc.retailPrice,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col H: Tax Price (Цена реализации для налога)
+    ws[XLSX.utils.encode_cell({ c: 7, r })] = {
+      t: 'n',
+      v: calc.taxPrice,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col I: COGS (Закупка)
+    ws[XLSX.utils.encode_cell({ c: 8, r })] = {
+      t: 'n',
+      v: calc.cogs,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col J: Ad spend rate % (ДРР)
+    const adRateDecimal = Number((prod.adSpendPercent / 100).toFixed(4));
+    ws[XLSX.utils.encode_cell({ c: 9, r })] = {
+      t: 'n',
+      v: adRateDecimal,
+      z: '0.0%',
+    };
+
+    // Col K: Base logistics tariff (Formula based on Ozon official liter tiers & 300₽ threshold)
+    const logisticsFormula = `IF(G${excelRow}<=300,IF(F${excelRow}<=0.2,20,IF(F${excelRow}<=0.4,22,IF(F${excelRow}<=0.6,23,IF(F${excelRow}<=0.8,23,IF(F${excelRow}<=1,25,IF(F${excelRow}<=1.25,27,27+(F${excelRow}-1.25)*10)))))),IF(F${excelRow}<=0.2,76,IF(F${excelRow}<=0.4,84,IF(F${excelRow}<=0.6,88,IF(F${excelRow}<=0.8,88,IF(F${excelRow}<=1,88,IF(F${excelRow}<=1.25,89,89+(F${excelRow}-1.25)*15)))))))`;
+    ws[XLSX.utils.encode_cell({ c: 10, r })] = {
+      t: 'n',
+      v: calc.baseLogisticsTariff,
+      f: logisticsFormula,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col L: Last mile 4.9% (=ROUND(G{row} * 0.049, 2))
+    ws[XLSX.utils.encode_cell({ c: 11, r })] = {
+      t: 'n',
+      v: Number(calc.lastMileRub.toFixed(2)),
+      f: `ROUND(G${excelRow}*0.049,2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col M: Acquiring 1.5% (=ROUND(G{row} * 0.015, 2))
+    ws[XLSX.utils.encode_cell({ c: 12, r })] = {
+      t: 'n',
+      v: Number(calc.acquiringRub.toFixed(2)),
+      f: `ROUND(G${excelRow}*0.015,2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col N: Cross-dock fixed (₽)
+    ws[XLSX.utils.encode_cell({ c: 13, r })] = {
+      t: 'n',
+      v: Number(calc.crossDockRub.toFixed(2)),
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col O: DDV fixed (₽)
+    ws[XLSX.utils.encode_cell({ c: 14, r })] = {
+      t: 'n',
+      v: Number(calc.ddvRub.toFixed(2)),
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col P: LP fixed (₽)
+    ws[XLSX.utils.encode_cell({ c: 15, r })] = {
+      t: 'n',
+      v: Number(calc.lpRub.toFixed(2)),
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col Q: Total logistics (=SUM(K{row}:P{row}))
+    ws[XLSX.utils.encode_cell({ c: 16, r })] = {
+      t: 'n',
+      v: Number(calc.totalLogisticsRub.toFixed(2)),
+      f: `SUM(K${excelRow}:P${excelRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col R: Commission Ozon (23% if price <= 300, 52% if price > 300)
+    const commFormula = `IF(G${excelRow}<=300,ROUND(G${excelRow}*0.23,2),ROUND(G${excelRow}*0.52,2))`;
+    ws[XLSX.utils.encode_cell({ c: 17, r })] = {
+      t: 'n',
+      v: Number(calc.commissionRub.toFixed(2)),
+      f: commFormula,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col S: Fulfillment (₽)
+    ws[XLSX.utils.encode_cell({ c: 18, r })] = {
+      t: 'n',
+      v: calc.fulfillmentRub,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col T: Ad spend ₽ (=ROUND(G{row} * J{row}, 2))
+    ws[XLSX.utils.encode_cell({ c: 19, r })] = {
+      t: 'n',
+      v: Number(calc.adSpendRub.toFixed(2)),
+      f: `ROUND(G${excelRow}*J${excelRow},2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col U: USN Tax 11% (=ROUND(H{row} * 0.11, 2) calculated on realization price in Col H)
+    ws[XLSX.utils.encode_cell({ c: 20, r })] = {
+      t: 'n',
+      v: Number(calc.taxRub.toFixed(2)),
+      f: `ROUND(H${excelRow}*0.11,2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col V: Force-majeure / defects 1% (=ROUND(G{row} * 0.01, 2))
+    ws[XLSX.utils.encode_cell({ c: 21, r })] = {
+      t: 'n',
+      v: Number(calc.forceMajeureRub.toFixed(2)),
+      f: `ROUND(G${excelRow}*0.01,2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col W: TOTAL EXPENSES (=I{row}+Q{row}+R{row}+S{row}+T{row}+U{row}+V{row})
+    ws[XLSX.utils.encode_cell({ c: 22, r })] = {
+      t: 'n',
+      v: Number(calc.totalExpensesRub.toFixed(2)),
+      f: `I${excelRow}+Q${excelRow}+R${excelRow}+S${excelRow}+T${excelRow}+U${excelRow}+V${excelRow}`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col X: NET PROFIT PER UNIT (=G{row} - W{row})
+    ws[XLSX.utils.encode_cell({ c: 23, r })] = {
+      t: 'n',
+      v: Number(calc.netProfitPerUnit.toFixed(2)),
+      f: `G${excelRow}-W${excelRow}`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col Y: Margin % (=IF(G{row}>0, X{row}/G{row}, 0))
+    ws[XLSX.utils.encode_cell({ c: 24, r })] = {
+      t: 'n',
+      v: Number((calc.marginPercent / 100).toFixed(4)),
+      f: `IF(G${excelRow}>0,X${excelRow}/G${excelRow},0)`,
+      z: '0.0%',
+    };
+
+    // Col Z: ROI % (=IF(I{row}>0, X{row}/I{row}, 0))
+    ws[XLSX.utils.encode_cell({ c: 25, r })] = {
+      t: 'n',
+      v: Number((calc.roiPercent / 100).toFixed(4)),
+      f: `IF(I${excelRow}>0,X${excelRow}/I${excelRow},0)`,
+      z: '0.0%',
+    };
+
+    // Col AA: Break-even retail price
+    const beFormula = `ROUND((I${excelRow}+K${excelRow}+N${excelRow}+O${excelRow}+P${excelRow}+S${excelRow})/MAX(0.01,1-(IF(G${excelRow}<=300,0.23,0.52)+0.049+0.015+J${excelRow}+0.11+0.01)),0)`;
+    ws[XLSX.utils.encode_cell({ c: 26, r })] = {
+      t: 'n',
+      v: Number(calc.breakEvenPrice.toFixed(0)),
+      f: beFormula,
+      z: '#,##0 "₽"',
+    };
+
+    // Col AB: Planned Monthly Sales (units)
+    ws[XLSX.utils.encode_cell({ c: 27, r })] = {
+      t: 'n',
+      v: prod.plannedSalesUnits || 150,
+      z: '#,##0 "шт"',
+    };
+
+    // Col AC: Monthly Revenue (=ROUND(G{row} * AB{row}, 2))
+    ws[XLSX.utils.encode_cell({ c: 28, r })] = {
+      t: 'n',
+      v: Number(calc.monthlyRevenue.toFixed(2)),
+      f: `ROUND(G${excelRow}*AB${excelRow},2)`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Col AD: Monthly Net Profit (=ROUND(X{row} * AB{row}, 2))
+    ws[XLSX.utils.encode_cell({ c: 29, r })] = {
+      t: 'n',
+      v: Number(calc.monthlyNetProfit.toFixed(2)),
+      f: `ROUND(X${excelRow}*AB${excelRow},2)`,
+      z: '#,##0.00 "₽"',
+    };
+  });
+
+  // 3. Summary Row at the Bottom (Row list.length + 1)
+  const summaryR = list.length + 1;
+  const summaryExcelRow = summaryR + 1;
+  const firstRow = 2;
+  const lastProdRow = list.length + 1;
+
+  if (list.length > 0) {
+    // Label
+    ws[XLSX.utils.encode_cell({ c: 1, r: summaryR })] = {
+      t: 's',
+      v: 'ИТОГО ПО МАГАЗИНУ (ИТОГИ / СРЕДНИЕ)',
+    };
+
+    // Avg retail price
+    ws[XLSX.utils.encode_cell({ c: 6, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(G${firstRow}:G${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Avg COGS
+    ws[XLSX.utils.encode_cell({ c: 8, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(I${firstRow}:I${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Avg total logistics
+    ws[XLSX.utils.encode_cell({ c: 16, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(Q${firstRow}:Q${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Avg commission
+    ws[XLSX.utils.encode_cell({ c: 17, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(R${firstRow}:R${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Avg total expenses
+    ws[XLSX.utils.encode_cell({ c: 22, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(W${firstRow}:W${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Avg unit net profit
+    ws[XLSX.utils.encode_cell({ c: 23, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(X${firstRow}:X${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Store weighted margin
+    ws[XLSX.utils.encode_cell({ c: 24, r: summaryR })] = {
+      t: 'n',
+      f: `IF(SUM(AC${firstRow}:AC${lastProdRow})>0,SUM(AD${firstRow}:AD${lastProdRow})/SUM(AC${firstRow}:AC${lastProdRow}),0)`,
+      z: '0.0%',
+    };
+
+    // Avg ROI
+    ws[XLSX.utils.encode_cell({ c: 25, r: summaryR })] = {
+      t: 'n',
+      f: `AVERAGE(Z${firstRow}:Z${lastProdRow})`,
+      z: '0.0%',
+    };
+
+    // Total monthly sales units
+    ws[XLSX.utils.encode_cell({ c: 27, r: summaryR })] = {
+      t: 'n',
+      f: `SUM(AB${firstRow}:AB${lastProdRow})`,
+      z: '#,##0 "шт"',
+    };
+
+    // Total monthly revenue
+    ws[XLSX.utils.encode_cell({ c: 28, r: summaryR })] = {
+      t: 'n',
+      f: `SUM(AC${firstRow}:AC${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+
+    // Total monthly net profit
+    ws[XLSX.utils.encode_cell({ c: 29, r: summaryR })] = {
+      t: 'n',
+      f: `SUM(AD${firstRow}:AD${lastProdRow})`,
+      z: '#,##0.00 "₽"',
+    };
+  }
+
+  // Set worksheet bounds & column widths
+  const maxRowIndex = list.length > 0 ? summaryR : 0;
+  ws['!ref'] = XLSX.utils.encode_range({
+    s: { c: 0, r: 0 },
+    e: { c: totalCols - 1, r: maxRowIndex },
+  });
+
+  ws['!cols'] = columnDefs.map((col) => ({ wch: col.width }));
+
+  // Auto-filter on the data range headers
+  if (list.length > 0) {
+    ws['!autofilter'] = {
+      ref: XLSX.utils.encode_range({
+        s: { c: 0, r: 0 },
+        e: { c: totalCols - 1, r: lastProdRow - 1 },
+      }),
+    };
+  }
+
+  // Append Main Sheet
+  XLSX.utils.book_append_sheet(wb, ws, 'Юнит-экономика товаров');
+
+  // 4. Create Sheet 2: Methodology & Tariff Reference
+  const guideData = [
+    {
+      'Раздел': 'Порог 300 ₽ на Ozon',
+      'Параметр / Правило': 'Ступень тарификации Ozon 2025/2026',
+      'Значение': 'При розничной цене ≤ 300 ₽ комиссия составляет 23%, базовый тариф логистики от 20 ₽. При цене > 300 ₽ комиссия возрастает до 52%, а базовый тариф логистики начинается от 76 ₽.',
+    },
+    {
+      'Раздел': 'Зона обрыва 301–350 ₽',
+      'Параметр / Правило': 'Опасная ценовая яма',
+      'Значение': 'Товары в диапазоне 301–350 ₽ приносят продавцу МЕНЬШЕ чистой прибыли, чем при цене 300 ₽ из-за резкого скачка комиссии на +29% и логистики на +56 ₽. Рекомендуется продавать по 300 ₽ либо повышать выше 380 ₽.',
+    },
+    {
+      'Раздел': 'База налога УСН 11%',
+      'Параметр / Правило': 'Колонка H (База налога / Цена реализации)',
+      'Значение': 'Налог 11% исчисляется от фактической цены реализации товара (Колонка H), а не от розничной цены со скидкой. Формула: =ROUND(H{строка} * 0.11, 2).',
+    },
+    {
+      'Раздел': 'Логистика Ozon FBO',
+      'Параметр / Правило': 'Формула по литражу (Колонка F)',
+      'Значение': 'Считается по ступеням объёма: ≤0.2л (20₽/76₽), ≤0.4л (22₽/84₽), ≤0.6л (23₽/88₽), ≤0.8л (23₽/88₽), ≤1.0л (25₽/88₽), ≤1.25л (27₽/89₽), свыше 1.25л (+10₽/+15₽ за доп. литр).',
+    },
+    {
+      'Раздел': 'Сборы маркетплейса',
+      'Параметр / Правило': 'Последняя миля и эквайринг',
+      'Значение': 'Последняя миля: 4.9% от розничной цены продажи. Интернет-эквайринг: 1.5% от розничной цены продажи.',
+    },
+    {
+      'Раздел': 'Реклама (ДРР)',
+      'Параметр / Правило': 'Колонка J (ДРР %)',
+      'Значение': 'Расход на рекламу Ozon Performance рассчитывается в рублях как: =ROUND(G{строка} * J{строка}, 2).',
+    },
+    {
+      'Раздел': 'Динамические формулы',
+      'Параметр / Правило': 'Интерактивность Excel таблицы',
+      'Значение': 'Все формулы в файле живые: при изменении розничной цены (Колонка G), себестоимости закупки (Колонка I), литража (Колонка F) или % рекламы (Колонка J) все расходы, налоги, маржа и чистая прибыль автоматически пересчитываются!',
+    },
+  ];
+
+  const wsGuide = XLSX.utils.json_to_sheet(guideData);
+  wsGuide['!cols'] = [{ wch: 26 }, { wch: 36 }, { wch: 80 }];
+  XLSX.utils.book_append_sheet(wb, wsGuide, 'Тарифы и методология');
+
+  // Trigger download in browser
   const dateStr = new Date().toISOString().split('T')[0];
-  XLSX.writeFile(wb, `Юнит_Экономика_Магазина_${dateStr}.xlsx`);
+  XLSX.writeFile(wb, `Юнит_Экономика_Ozon_${dateStr}.xlsx`);
 }
+

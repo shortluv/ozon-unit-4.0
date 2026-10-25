@@ -276,11 +276,11 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* 1. Header Toolbar: Period Selector, Filters, Refresh */}
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* 1. Header Toolbar: Period Selector, Filters, Refresh (Mercury style) */}
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Title and live status */}
         <div className="flex items-start gap-3">
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 shrink-0">
+          <div className="p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 shrink-0">
             <Zap className="w-5 h-5 stroke-[2.2]" />
           </div>
           <div>
@@ -300,12 +300,12 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         {/* Controls: Periods & Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Period Segmented Buttons */}
-          <div className="flex items-center gap-1 p-1 bg-[#080b11] border border-white/[0.06] rounded-xl text-xs">
+          <div className="flex items-center gap-1 p-1 bg-[#080c16] border border-white/[0.08] rounded-xl text-xs">
             <button
               onClick={() => setPeriod('today')}
               className={`px-3 py-1 font-medium rounded-lg transition-all cursor-pointer ${
                 period === 'today'
-                  ? 'bg-white/[0.1] text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -315,7 +315,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
               onClick={() => setPeriod('7d')}
               className={`px-3 py-1 font-medium rounded-lg transition-all cursor-pointer ${
                 period === '7d'
-                  ? 'bg-white/[0.1] text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -325,7 +325,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
               onClick={() => setPeriod('30d')}
               className={`px-3 py-1 font-medium rounded-lg transition-all cursor-pointer ${
                 period === '30d'
-                  ? 'bg-white/[0.1] text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -335,7 +335,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
               onClick={() => setPeriod('90d')}
               className={`px-3 py-1 font-medium rounded-lg transition-all cursor-pointer ${
                 period === '90d'
-                  ? 'bg-white/[0.1] text-white shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -345,7 +345,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
               onClick={() => setPeriod('custom')}
               className={`px-3 py-1 font-medium rounded-lg transition-all cursor-pointer ${
                 period === 'custom'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm'
+                  ? 'bg-indigo-600 text-white shadow-sm font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -355,7 +355,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
 
           {/* Custom Days Input if custom period */}
           {period === 'custom' && (
-            <div className="flex items-center gap-1.5 bg-[#080b11] border border-white/[0.08] px-2.5 py-1 rounded-xl text-xs">
+            <div className="flex items-center gap-1.5 bg-[#080c16] border border-white/[0.08] px-2.5 py-1 rounded-xl text-xs">
               <span className="text-slate-400 text-[11px]">Дней:</span>
               <input
                 type="number"
@@ -373,7 +373,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             <select
               value={selectedSku}
               onChange={(e) => setSelectedSku(e.target.value)}
-              className="text-xs bg-[#080b11] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/60 cursor-pointer max-w-[160px] truncate"
+              className="text-xs bg-[#080c16] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[160px] truncate"
             >
               <option value="all">Все товары ({products.length})</option>
               {products.map((p) => (
@@ -390,7 +390,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="text-xs bg-[#080b11] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/60 cursor-pointer max-w-[160px] truncate"
+                className="text-xs bg-[#080c16] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer max-w-[160px] truncate"
               >
                 <option value="all">Все категории</option>
                 {categories.map((c) => (
@@ -409,14 +409,14 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-slate-200 transition-all cursor-pointer border border-white/[0.08]"
             title="Обновить аналитические показатели"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-indigo-400' : ''}`} />
             <span className="hidden sm:inline">Обновить</span>
           </button>
         </div>
       </div>
 
       {/* Sync Status Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-[#0a0f19] border border-white/[0.06] text-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-[#080c16] border border-white/[0.08] text-xs">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
             <span className="text-slate-400">Статус API:</span>
@@ -445,7 +445,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
 
         <button
           onClick={onOpenOzonSync}
-          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 cursor-pointer self-start sm:self-auto"
+          className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer self-start sm:self-auto font-medium"
         >
           <span>Настройки ключей и тарифов Ozon</span>
           <ExternalLink className="w-3 h-3" />
@@ -455,7 +455,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
       {/* 2. ЭТАП 4.1: 8 ЖИВЫХ KPI-ВИДЖЕТОВ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Выручка */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Выручка за {periodDays} дн.</span>
@@ -492,7 +492,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 2: Чистая прибыль */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Чистая прибыль</span>
@@ -528,7 +528,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 3: Маржинальность */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Маржинальность %</span>
@@ -555,7 +555,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 4: ДРР (Доля рекламных расходов) */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Средний ДРР %</span>
@@ -581,7 +581,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 5: Заказы / Продажи */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Количество заказов</span>
@@ -602,7 +602,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 6: Средний чек (AOV) */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Средний чек (AOV)</span>
@@ -623,7 +623,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 7: Логистика и сбор Ozon */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Логистика Ozon</span>
@@ -646,7 +646,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Card 8: Убыточные товары */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-sm flex flex-col justify-between hover:border-white/[0.15] transition-all">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <div className="flex items-center gap-1.5">
               <span className="font-semibold text-white">Убыточные позиции</span>
@@ -670,7 +670,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
       </div>
 
       {/* 3. ЭТАП 5: ЖИВАЯ ПАНЕЛЬ ТАРИФОВ И УДЕРЖАНИЙ OZON */}
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] space-y-4">
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.06] pb-3.5">
           <div className="flex items-center gap-2.5">
             <Building2 className="w-4 h-4 text-emerald-400" />
@@ -692,7 +692,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
 
         {/* Сетка тарифов (Блок А: Нормативные тарифы) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="p-3.5 rounded-xl bg-[#080b11] border border-white/[0.06]">
+          <div className="p-3.5 rounded-xl bg-[#080c16] border border-white/[0.06]">
             <div className="text-[11px] text-slate-400 mb-1">Ступень до 300 ₽:</div>
             <div className="text-lg font-bold font-mono text-emerald-400">23.0%</div>
             <div className="text-[10px] text-slate-500 mt-1">
@@ -700,7 +700,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#080b11] border border-white/[0.06]">
+          <div className="p-3.5 rounded-xl bg-[#080c16] border border-white/[0.06]">
             <div className="text-[11px] text-slate-400 mb-1">Ступень свыше 300 ₽:</div>
             <div className="text-lg font-bold font-mono text-amber-400">52.0%</div>
             <div className="text-[10px] text-slate-500 mt-1">
@@ -708,7 +708,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#080b11] border border-white/[0.06]">
+          <div className="p-3.5 rounded-xl bg-[#080c16] border border-white/[0.06]">
             <div className="text-[11px] text-slate-400 mb-1">Логистика Ozon FBO:</div>
             <div className="text-lg font-bold font-mono text-white">
               43.5 ₽ <span className="text-xs text-slate-400 font-normal">(&le;0.1л) / 76-89 ₽</span>
@@ -718,7 +718,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#080b11] border border-white/[0.06]">
+          <div className="p-3.5 rounded-xl bg-[#080c16] border border-white/[0.06]">
             <div className="text-[11px] text-slate-400 mb-1">Сборы Ozon Take Rate:</div>
             <div className="text-lg font-bold font-mono text-cyan-300">
               {currentPeriodKPI.ozonTakeRatePercent.toFixed(1)}%
@@ -730,7 +730,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         </div>
 
         {/* Блок Б: Фактические удержания маркетплейса за период */}
-        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-[#080b11]/60 p-3 rounded-xl border border-white/[0.04]">
+        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-[#080c16]/60 p-3 rounded-xl border border-white/[0.04]">
           <div className="flex flex-wrap items-center gap-4 text-slate-300">
             <span>
               Сумма комиссий за {periodDays} дн.:{' '}
@@ -757,7 +757,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
       </div>
 
       {/* 4. ЭТАП 6: ИНТЕРАКТИВНЫЙ ГРАФИК ИСТОРИИ ЦЕН */}
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] space-y-4">
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] space-y-4">
         {/* Header of Chart block */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/[0.06] pb-3.5">
           <div className="flex items-center gap-2.5">
@@ -778,7 +778,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             <select
               value={chartProductSku}
               onChange={(e) => setChartProductSku(e.target.value)}
-              className="text-xs bg-[#080b11] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-blue-500/60 cursor-pointer max-w-[220px] truncate"
+              className="text-xs bg-[#080c16] border border-white/[0.08] text-slate-200 rounded-xl px-2.5 py-1.5 focus:outline-none focus:border-blue-500/60 cursor-pointer max-w-[220px] truncate"
             >
               {products.map((p) => (
                 <option key={p.sku} value={p.sku}>
@@ -788,7 +788,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
             </select>
 
             {/* Timeframe for Chart */}
-            <div className="flex items-center gap-1 p-0.5 bg-[#080b11] border border-white/[0.06] rounded-xl text-xs">
+            <div className="flex items-center gap-1 p-0.5 bg-[#080c16] border border-white/[0.06] rounded-xl text-xs">
               {[7, 30, 90].map((d) => (
                 <button
                   key={d}
@@ -809,7 +809,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         {/* Product price summary cards */}
         {chartProduct && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+            <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
               <span className="text-[10px] text-slate-400 block mb-0.5">Товар:</span>
               <div className="font-semibold text-white truncate" title={chartProduct.title}>
                 {chartProduct.title}
@@ -846,7 +846,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
         )}
 
         {/* Visual Chart */}
-        <div className="bg-[#080b11] border border-white/[0.06] rounded-xl p-4 relative">
+        <div className="bg-[#080c16] border border-white/[0.06] rounded-xl p-4 relative">
           <div className="flex items-center justify-between text-xs text-slate-400 mb-3">
             <div className="flex items-center gap-4 text-[11px]">
               <div className="flex items-center gap-1.5">
@@ -939,7 +939,7 @@ export const LiveAnalytics: React.FC<LiveAnalyticsProps> = ({
 
           {/* Hovered Point Tooltip */}
           {hoveredPoint && (
-            <div className="mt-2 p-2.5 rounded-lg bg-[#0e1420] border border-emerald-500/30 text-xs flex items-center justify-between animate-in fade-in">
+            <div className="mt-2 p-2.5 rounded-lg bg-[#0e1424] border border-emerald-500/30 text-xs flex items-center justify-between animate-in fade-in">
               <div className="flex items-center gap-3">
                 <span className="font-mono text-emerald-400 font-bold">
                   {hoveredPoint.retailPrice} ₽ (предельная)

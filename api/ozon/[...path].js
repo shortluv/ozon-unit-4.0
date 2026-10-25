@@ -32,11 +32,27 @@ export default async function handler(req, res) {
     }
 
     if (!ozonPath && req.url) {
-      const [pathname] = req.url.split('?');
-      ozonPath = pathname.replace(/^\/api\/ozon\/?/i, '');
+      const [pathname, search] = req.url.split('?');
+      if (search) {
+        try {
+          const params = new URLSearchParams(search);
+          const qp = params.get('path');
+          if (qp) ozonPath = qp;
+        } catch {
+          // ignore
+        }
+      }
+      if (!ozonPath) {
+        ozonPath = pathname.replace(/^\/api\/ozon\/?/i, '');
+      }
     }
 
     ozonPath = ozonPath.replace(/^\/+/, '');
+
+    // Защита от ошибочных квадратных скобок Vercel router
+    if (ozonPath === '[...path]' || ozonPath === '%5B...path%5D' || ozonPath.startsWith('[...path]')) {
+      ozonPath = '';
+    }
 
     // Диагностика при обращении к /api/ozon
     if (!ozonPath) {

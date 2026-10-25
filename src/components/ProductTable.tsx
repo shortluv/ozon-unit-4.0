@@ -34,7 +34,9 @@ import {
   Check,
   RotateCcw,
   Flame,
+  Download,
 } from 'lucide-react';
+import { exportProductsToExcel } from '../utils/excelHelper';
 
 interface ProductTableProps {
   products: ProductUnitData[];
@@ -46,6 +48,7 @@ interface ProductTableProps {
   onUpdateWarehouseAll?: (warehouseName: string, warehouseType: 'FBO' | 'FBS') => void;
   activeFilter: string;
   setActiveFilter: (filter: string) => void;
+  onExport?: () => void;
 }
 
 export const ProductTable: React.FC<ProductTableProps> = ({
@@ -58,6 +61,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onUpdateWarehouseAll,
   activeFilter,
   setActiveFilter,
+  onExport,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'profit' | 'margin' | 'revenue' | 'price' | 'sku' | 'volume'>('profit');
@@ -201,15 +205,23 @@ export const ProductTable: React.FC<ProductTableProps> = ({
     }
   };
 
+  const handleExcelExport = () => {
+    if (onExport) {
+      onExport();
+    } else {
+      exportProductsToExcel(products);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {/* High-Tech Flow Guide (Uptic Style) */}
+      {/* High-Tech Flow Guide (Mercury Style) */}
       {showFormulaGuide && (
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] relative overflow-hidden transition-all">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] relative overflow-hidden transition-all">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-300 font-mono">
                 Цепочка расчета юнит-экономики единицы товара
               </h2>
             </div>
@@ -225,13 +237,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           {/* Visual Formula Pipeline */}
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-xs">
             {/* Step 1: Retail Price */}
-            <div className="p-3 rounded-lg bg-emerald-500/[0.07] border border-emerald-500/20">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-semibold mb-0.5">
+            <div className="p-3 rounded-lg bg-indigo-500/[0.08] border border-indigo-500/20">
+              <div className="flex items-center gap-1.5 text-indigo-400 font-semibold mb-0.5">
                 <Tag className="w-3.5 h-3.5" />
                 <span>1. Цена</span>
               </div>
               <div className="text-[11px] text-slate-300">Предельная Ozon</div>
-              <div className="text-[10px] text-emerald-400/90 font-mono mt-1 font-medium">Ozon API / ввод</div>
+              <div className="text-[10px] text-indigo-400/90 font-mono mt-1 font-medium">Ozon API / ввод</div>
             </div>
 
             {/* Step 2: Tax Realization Price */}
@@ -275,7 +287,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             </div>
 
             {/* Step 6: Logistics & Comm */}
-            <div className="p-3 rounded-lg bg-[#080b11] border border-white/[0.06]">
+            <div className="p-3 rounded-lg bg-[#080c16] border border-white/[0.06]">
               <div className="text-slate-300 font-semibold mb-0.5">
                 − Логистика и сбор
               </div>
@@ -284,7 +296,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             </div>
 
             {/* Step 7: Fulfillment & Tax */}
-            <div className="p-3 rounded-lg bg-[#080b11] border border-white/[0.06]">
+            <div className="p-3 rounded-lg bg-[#080c16] border border-white/[0.06]">
               <div className="text-slate-300 font-semibold mb-0.5">
                 − ФФ и налог
               </div>
@@ -307,14 +319,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
       {/* Dynamic Widgets Strip */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
         {/* Widget 1: Ozon 300 ₽ Radar & Ступени комиссий */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+              <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 <Zap className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Радар Ozon 300 ₽</h3>
+                <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">Радар Ozon 300 ₽</h3>
                 <p className="text-[10px] text-slate-400">Льготная комиссия 23% vs полная 52%</p>
               </div>
             </div>
@@ -368,14 +380,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </div>
 
         {/* Widget 2: Live What-if Simulator */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
+              <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 <Sliders className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">What-If Симулятор</h3>
+                <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">What-If Симулятор</h3>
                 <p className="text-[10px] text-slate-400">Мгновенный стресс-тест цен и рекламы</p>
               </div>
             </div>
@@ -403,7 +415,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     onClick={() => setSimPriceDelta(d)}
                     className={`px-1.5 py-0.5 text-[10px] font-mono rounded cursor-pointer transition-colors ${
                       simPriceDelta === d
-                        ? 'bg-blue-500 text-white font-bold'
+                        ? 'bg-indigo-600 text-white font-bold'
                         : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1]'
                     }`}
                   >
@@ -422,7 +434,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                     onClick={() => setSimDrrDelta(d)}
                     className={`px-1.5 py-0.5 text-[10px] font-mono rounded cursor-pointer transition-colors ${
                       simDrrDelta === d
-                        ? 'bg-pink-500 text-white font-bold'
+                        ? 'bg-pink-600 text-white font-bold'
                         : 'bg-white/[0.05] text-slate-300 hover:bg-white/[0.1]'
                     }`}
                   >
@@ -438,7 +450,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             <div>
               <div className="text-[10px] text-slate-400">Итог чистой прибыли:</div>
               <div className="flex items-center gap-1.5">
-                <span className="font-mono text-xs font-bold text-white">
+                <span className="font-mono text-xs font-semibold text-white">
                   {formatCurrency(simulatedTotalMonthlyProfit)}
                 </span>
                 <span
@@ -458,10 +470,10 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             <button
               onClick={handleApplySimulation}
               disabled={simPriceDelta === 0 && simDrrDelta === 0}
-              className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+              className={`px-2.5 py-1 text-[11px] font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                 simPriceDelta === 0 && simDrrDelta === 0
                   ? 'bg-white/[0.06] text-slate-500 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-500 text-white shadow-sm'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-600/30'
               }`}
             >
               <Check className="w-3 h-3" />
@@ -476,14 +488,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </div>
 
         {/* Widget 3: Logistics & Dimensions Analytics */}
-        <div className="bg-[#0e1420] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+              <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 <Box className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">Габариты &amp; Литраж</h3>
+                <h3 className="text-xs font-semibold text-white uppercase tracking-wider font-mono">Габариты &amp; Литраж</h3>
                 <p className="text-[10px] text-slate-400">Логистика FBO/FBS по объему коробки</p>
               </div>
             </div>
@@ -527,31 +539,77 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         </div>
       </div>
 
-      {/* Main Table Container */}
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05),0_8px_30px_rgb(0_0_0_/_40%)]">
-        {/* Control Toolbar */}
-        <div className="p-4 border-b border-white/[0.06] flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[#0a0f19]">
-          {/* Search & Filters */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Search bar */}
-            <div className="relative min-w-[260px]">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+      {/* Main Table Container (Mercury Ledger) */}
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
+        {/* Control Toolbar (Mercury Ledger) */}
+        <div className="p-4 border-b border-white/[0.06] flex flex-col gap-3.5 bg-[#0a0e19]">
+          {/* Top Row: Prominent Real-Time Search Bar & Primary Actions */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            {/* Real-time Search Input */}
+            <div className="relative flex-1 min-w-[280px]">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Поиск по артикулу, названию или бренду..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 transition-all font-sans"
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setSearchQuery('');
+                }}
+                placeholder="Поиск по артикулу (SKU), названию, категории или штрихкоду..."
+                className="w-full pl-10 pr-28 py-2 text-xs bg-[#080c16] border border-white/[0.1] rounded-xl text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 transition-all font-sans"
               />
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="p-1 text-slate-400 hover:text-slate-200 hover:bg-white/[0.08] rounded-md transition-colors cursor-pointer"
+                    title="Очистить поиск (Esc)"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.08] text-slate-400 select-none">
+                  {sortedProducts.length}/{products.length} SKU
+                </span>
+              </div>
             </div>
 
+            {/* Quick Actions: Export XLSX with formulas & Formula guide */}
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleExcelExport}
+                className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-emerald-300 bg-emerald-500/[0.1] hover:bg-emerald-500/[0.18] border border-emerald-500/30 rounded-xl transition-all cursor-pointer shadow-sm shadow-emerald-950/40"
+                title="Экспорт в Excel (.xlsx) с математическими формулами и динамическими расчётами"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Экспорт в Excel</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-normal">
+                  .xlsx
+                </span>
+              </button>
+
+              {!showFormulaGuide && (
+                <button
+                  onClick={() => setShowFormulaGuide(true)}
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-300 bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] rounded-xl transition-all cursor-pointer"
+                  title="Показать цепочку формул юнит-экономики"
+                >
+                  <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Формулы</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom Row: Segmented Status Filters & Global Presets */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-white/[0.04]">
             {/* Segmented Filter Buttons */}
-            <div className="flex items-center gap-1 p-1 bg-[#080b11] border border-white/[0.06] rounded-xl">
+            <div className="flex items-center gap-1 p-1 bg-[#080c16] border border-white/[0.06] rounded-xl overflow-x-auto max-w-full">
               <button
                 onClick={() => setActiveFilter('all')}
                 className={`px-3 py-1 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer ${
                   activeFilter === 'all'
-                    ? 'bg-white/[0.1] text-white shadow-sm'
+                    ? 'bg-indigo-600/20 text-indigo-200 border border-indigo-500/30 shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -587,75 +645,85 @@ export const ProductTable: React.FC<ProductTableProps> = ({
               >
                 Убыточные
               </button>
-            </div>
-          </div>
-
-          {/* Global Preset Applicator & Guide Toggle */}
-          <div className="flex items-center gap-3">
-            {!showFormulaGuide && (
               <button
-                onClick={() => setShowFormulaGuide(true)}
-                className="text-xs text-slate-400 hover:text-emerald-400 flex items-center gap-1.5 cursor-pointer transition-colors"
+                onClick={() => setActiveFilter(activeFilter === 'under_300' ? 'all' : 'under_300')}
+                className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer hidden md:inline-block ${
+                  activeFilter === 'under_300'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
               >
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>Цепочка формул</span>
+                ≤ 300 ₽
               </button>
-            )}
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
-                Тарифы:
-              </span>
-              <select
-                value={selectedPreset}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSelectedPreset(val);
-                  if (val) {
-                    onApplyPresetToAll(val);
-                    setSelectedPreset('');
-                  }
-                }}
-                className="text-xs bg-[#080b11] border border-white/[0.08] text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/60 cursor-pointer"
+              <button
+                onClick={() => setActiveFilter(activeFilter === 'cliff' ? 'all' : 'cliff')}
+                className={`px-2.5 py-1 text-xs font-medium rounded-lg transition-all whitespace-nowrap cursor-pointer hidden md:inline-block ${
+                  activeFilter === 'cliff'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
               >
-                <option value="">Применить маркетплейс...</option>
-                {MARKETPLACE_PRESETS.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
+                301–350 ₽
+              </button>
             </div>
 
-            {/* Warehouse Selector for all */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-                Склад:
-              </span>
-              <select
-                value={selectedWarehousePreset}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSelectedWarehousePreset(val);
-                  if (val && onUpdateWarehouseAll) {
-                    const found = STANDARD_WAREHOUSES.find((w) => w.id === val);
-                    if (found) {
-                      onUpdateWarehouseAll(found.name, found.type);
+            {/* Global Preset Applicators */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1.5">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
+                  Тарифы:
+                </span>
+                <select
+                  value={selectedPreset}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedPreset(val);
+                    if (val) {
+                      onApplyPresetToAll(val);
+                      setSelectedPreset('');
                     }
-                    setSelectedWarehousePreset('');
-                  }
-                }}
-                className="text-xs bg-[#080b11] border border-white/[0.08] text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/60 cursor-pointer"
-              >
-                <option value="">Склад для всех позиций...</option>
-                {STANDARD_WAREHOUSES.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
+                  }}
+                  className="text-xs bg-[#080c16] border border-white/[0.08] text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                >
+                  <option value="">Применить маркетплейс...</option>
+                  {MARKETPLACE_PRESETS.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Warehouse Selector for all */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs text-slate-400 whitespace-nowrap flex items-center gap-1">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                  Склад:
+                </span>
+                <select
+                  value={selectedWarehousePreset}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectedWarehousePreset(val);
+                    if (val && onUpdateWarehouseAll) {
+                      const found = STANDARD_WAREHOUSES.find((w) => w.id === val);
+                      if (found) {
+                        onUpdateWarehouseAll(found.name, found.type);
+                      }
+                      setSelectedWarehousePreset('');
+                    }
+                  }}
+                  className="text-xs bg-[#080c16] border border-white/[0.08] text-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                >
+                  <option value="">Склад для всех позиций...</option>
+                  {STANDARD_WAREHOUSES.map((w) => (
+                    <option key={w.id} value={w.id}>
+                      {w.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -665,28 +733,28 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               {/* Group Header Row */}
-              <tr className="border-b border-white/[0.08] text-[10px] uppercase font-bold tracking-wider">
-                <th colSpan={2} className="py-2.5 px-4 bg-[#080b11] text-slate-300 border-r border-white/[0.1] sticky left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
+              <tr className="border-b border-white/[0.08] text-[10px] uppercase font-bold tracking-wider font-mono">
+                <th colSpan={2} className="py-2.5 px-4 bg-[#080c16] text-slate-300 border-r border-white/[0.08] sticky left-0 z-30 shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
                   Товар (закреплен)
                 </th>
-                <th colSpan={5} className="py-2.5 px-3 bg-emerald-500/[0.08] text-emerald-400 text-center border-r border-emerald-500/20">
+                <th colSpan={5} className="py-2.5 px-3 bg-indigo-500/[0.08] text-indigo-300 text-center border-r border-indigo-500/20">
                   5 изменяемых параметров (ввод селлера)
                 </th>
-                <th colSpan={2} className="py-2.5 px-3 bg-[#080b11] text-slate-400 text-center border-r border-white/[0.06] hidden xl:table-cell">
+                <th colSpan={2} className="py-2.5 px-3 bg-[#080c16] text-slate-400 text-center border-r border-white/[0.06] hidden xl:table-cell">
                   Сборы Ozon и склад
                 </th>
-                <th colSpan={3} className="py-2.5 px-4 bg-[#080b11] text-slate-200 text-center">
+                <th colSpan={3} className="py-2.5 px-4 bg-[#080c16] text-slate-200 text-center">
                   Финансовый результат
                 </th>
               </tr>
 
               {/* Specific Column Header Row */}
-              <tr className="bg-[#0b101b] border-b border-white/[0.06] text-slate-400">
+              <tr className="bg-[#0a0e19] border-b border-white/[0.06] text-slate-400">
                 {/* Expander col - STICKY */}
-                <th className="py-3 px-2 w-10 min-w-[40px] max-w-[40px] text-center sticky left-0 z-30 bg-[#0b101b]" />
+                <th className="py-3 px-2 w-10 min-w-[40px] max-w-[40px] text-center sticky left-0 z-30 bg-[#0a0e19]" />
 
                 {/* SKU & Title - STICKY */}
-                <th className="py-3 px-3 font-semibold whitespace-nowrap border-r border-white/[0.1] sticky left-[40px] z-30 bg-[#0b101b] w-64 min-w-[240px] max-w-[260px] shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
+                <th className="py-3 px-3 font-semibold whitespace-nowrap border-r border-white/[0.08] sticky left-[40px] z-30 bg-[#0a0e19] w-64 min-w-[240px] max-w-[260px] shadow-[4px_0_12px_rgba(0,0,0,0.5)]">
                   <button
                     onClick={() => toggleSort('sku')}
                     className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
@@ -783,8 +851,35 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             <tbody className="divide-y divide-white/[0.04]">
               {sortedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="py-12 text-center text-slate-500">
-                    По вашему запросу товаров не найдено
+                  <td colSpan={13} className="py-16 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-500">
+                        <Search className="w-6 h-6" />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-sm font-semibold text-slate-200">
+                          {searchQuery
+                            ? `Ничего не найдено по запросу «${searchQuery}»`
+                            : 'Товары не найдены для выбранного фильтра'}
+                        </div>
+                        <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                          {searchQuery
+                            ? 'Проверьте правильность написания артикула Ozon или названия товара.'
+                            : 'Попробуйте переключить фильтр или добавить новые позиции в каталог.'}
+                        </p>
+                      </div>
+                      {(searchQuery || activeFilter !== 'all') && (
+                        <button
+                          onClick={() => {
+                            setSearchQuery('');
+                            setActiveFilter('all');
+                          }}
+                          className="mt-1 px-3.5 py-1.5 text-xs font-medium text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 rounded-lg transition-colors cursor-pointer"
+                        >
+                          Сбросить поиск и фильтры
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -803,10 +898,10 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         <td
                           className={`py-2.5 px-2 text-center sticky left-0 z-20 w-10 min-w-[40px] max-w-[40px] transition-colors ${
                             calc.status === 'loss'
-                              ? 'bg-[#180f19] group-hover:bg-[#201524]'
+                              ? 'bg-[#180e1a] group-hover:bg-[#201524]'
                               : isExpanded
-                              ? 'bg-[#121927] group-hover:bg-[#162032]'
-                              : 'bg-[#0e1420] group-hover:bg-[#141d2f]'
+                              ? 'bg-[#0d1322] group-hover:bg-[#121829]'
+                              : 'bg-[#0a0e19] group-hover:bg-[#111726]'
                           }`}
                         >
                           <button
@@ -820,12 +915,12 @@ export const ProductTable: React.FC<ProductTableProps> = ({
 
                         {/* Item Details - STICKY */}
                         <td
-                          className={`py-2.5 px-3 w-64 min-w-[240px] max-w-[260px] border-r border-white/[0.1] sticky left-[40px] z-20 shadow-[4px_0_12px_rgba(0,0,0,0.5)] transition-colors ${
+                          className={`py-2.5 px-3 w-64 min-w-[240px] max-w-[260px] border-r border-white/[0.08] sticky left-[40px] z-20 shadow-[4px_0_12px_rgba(0,0,0,0.5)] transition-colors ${
                             calc.status === 'loss'
-                              ? 'bg-[#180f19] group-hover:bg-[#201524]'
+                              ? 'bg-[#180e1a] group-hover:bg-[#201524]'
                               : isExpanded
-                              ? 'bg-[#121927] group-hover:bg-[#162032]'
-                              : 'bg-[#0e1420] group-hover:bg-[#141d2f]'
+                              ? 'bg-[#0d1322] group-hover:bg-[#121829]'
+                              : 'bg-[#0a0e19] group-hover:bg-[#111726]'
                           }`}
                         >
                           <div className="font-medium text-white truncate" title={prod.title}>
@@ -866,7 +961,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         </td>
 
                         {/* 1. Предельная цена реализации (Input) */}
-                        <td className="py-2.5 px-3 text-right bg-emerald-500/[0.02] border-r border-emerald-500/10">
+                        <td className="py-2.5 px-3 text-right bg-indigo-500/[0.02] border-r border-indigo-500/10">
                           <div className="inline-flex items-center justify-end relative">
                             <input
                               type="number"
@@ -874,10 +969,10 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               min="0"
                               value={prod.retailPrice}
                               onChange={(e) => handlePriceChange(prod, Number(e.target.value))}
-                              className="w-24 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-bold bg-[#080b11] border border-emerald-500/40 hover:border-emerald-500 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30 rounded-lg text-emerald-300 focus:outline-none transition-all"
+                              className="w-24 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-indigo-500/40 hover:border-indigo-500 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400/30 rounded-lg text-indigo-200 focus:outline-none transition-all"
                               title="Предельная цена реализации"
                             />
-                            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-emerald-500/70 pointer-events-none">
+                            <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-indigo-400/70 pointer-events-none">
                               ₽
                             </span>
                           </div>
@@ -895,7 +990,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               min="0"
                               value={prod.taxPrice ?? prod.retailPrice}
                               onChange={(e) => handleTaxPriceChange(prod, Number(e.target.value))}
-                              className="w-24 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080b11] border border-cyan-500/40 hover:border-cyan-500 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 rounded-lg text-cyan-300 focus:outline-none transition-all"
+                              className="w-24 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-cyan-500/40 hover:border-cyan-500 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 rounded-lg text-cyan-300 focus:outline-none transition-all"
                               title="Цена реализации для налога (колонка E в Excel, база для УСН)"
                             />
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-cyan-400/70 pointer-events-none">
@@ -916,7 +1011,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               min="0"
                               value={prod.cogs}
                               onChange={(e) => handleCogsChange(prod, Number(e.target.value))}
-                              className="w-20 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080b11] border border-blue-500/40 hover:border-blue-500 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30 rounded-lg text-slate-200 focus:outline-none transition-all"
+                              className="w-20 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-blue-500/40 hover:border-blue-500 focus:border-blue-400 focus:ring-1 focus:ring-blue-400/30 rounded-lg text-slate-200 focus:outline-none transition-all"
                               title="Закупка (себестоимость товара)"
                             />
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-blue-400/70 pointer-events-none">
@@ -937,7 +1032,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               min="0.01"
                               value={prod.volumeLiters}
                               onChange={(e) => handleVolumeChange(prod, Number(e.target.value))}
-                              className="w-18 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080b11] border border-amber-500/40 hover:border-amber-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-amber-300 focus:outline-none transition-all"
+                              className="w-18 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-amber-500/40 hover:border-amber-500 focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 rounded-lg text-amber-300 focus:outline-none transition-all"
                               title="Литраж упаковки"
                             />
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-amber-500/70 pointer-events-none">
@@ -959,7 +1054,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               max="100"
                               value={prod.adSpendPercent}
                               onChange={(e) => handleAdSpendChange(prod, Number(e.target.value))}
-                              className="w-18 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080b11] border border-pink-500/40 hover:border-pink-500 focus:border-pink-400 focus:ring-1 focus:ring-pink-400/30 rounded-lg text-pink-300 focus:outline-none transition-all"
+                              className="w-18 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-pink-500/40 hover:border-pink-500 focus:border-pink-400 focus:ring-1 focus:ring-pink-400/30 rounded-lg text-pink-300 focus:outline-none transition-all"
                               title="Процент рекламы (ДРР %)"
                             />
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-pink-400/70 pointer-events-none">
@@ -1025,7 +1120,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                           <div className="flex items-center justify-center gap-1">
                             <button
                               onClick={() => onSelectForDeepDive(prod)}
-                              className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer"
+                              className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer"
                               title="Открыть экспресс-калькулятор для этой позиции"
                             >
                               <Calculator className="w-3.5 h-3.5" />
@@ -1048,14 +1143,14 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                         </td>
                       </tr>
 
-                      {/* Expandable Itemized Breakdown Card (Uptic-style cascade) */}
+                      {/* Expandable Itemized Breakdown Card (Mercury Ledger Cascade) */}
                       {isExpanded && (
-                        <tr className="bg-[#080b11]/80 border-b border-white/[0.08]">
+                        <tr className="bg-[#080c16]/80 border-b border-white/[0.08]">
                           <td colSpan={13} className="p-4">
-                            <div className="sticky left-0 max-w-[calc(100vw-3.5rem)] lg:max-w-7xl bg-[#0e1420] border border-white/[0.08] rounded-xl p-4.5 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+                            <div className="sticky left-0 max-w-[calc(100vw-3.5rem)] lg:max-w-7xl bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-3">
                                 <div className="flex items-center gap-2">
-                                  <Info className="w-4 h-4 text-emerald-400" />
+                                  <Info className="w-4 h-4 text-indigo-400" />
                                   <span className="font-semibold text-white text-xs">
                                     Полная калькуляция на 1 шт: куда уходит выручка с товара {prod.title}
                                   </span>
@@ -1071,7 +1166,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
 
                               {/* Breakdown Grid */}
                               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">1. Закупка (COGS)</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.cogs)}</div>
                                   <div className="text-[10px] text-slate-500 mt-1">
@@ -1079,7 +1174,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                   </div>
                                 </div>
 
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">2. Логистика (по литражу)</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.totalLogisticsRub)}</div>
                                   <div className="text-[10px] text-slate-500 mt-1">
@@ -1087,7 +1182,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                   </div>
                                 </div>
 
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">3. Комиссия маркетплейса</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.commissionRub)}</div>
                                   <div className="text-[10px] text-slate-500 mt-1">
@@ -1095,33 +1190,33 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                   </div>
                                 </div>
 
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">4. Реклама (ДРР)</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.adSpendRub)}</div>
                                   <div className="text-[10px] text-slate-500 mt-1">
-                                    {prod.adSpendPercent}% от цены
+                                    {calc.adSpendPercent}% от цены
                                   </div>
                                 </div>
 
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">5. Фулфилмент и кросс-док</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.fulfillmentRub + calc.crossDockRub)}</div>
                                   <div className="text-[10px] text-slate-500 mt-1">
-                                    ФФ {calc.fulfillmentRub}₽ + кросс-док {calc.crossDockRub}₽
+                                    ФФ {calc.fulfillmentRub}₽ + кросс {calc.crossDockRub}₽
                                   </div>
                                 </div>
 
-                                <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06]">
+                                <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06]">
                                   <div className="text-slate-400 text-[11px] mb-1">6. Налог УСН + резерв</div>
                                   <div className="font-mono font-bold text-white text-sm">{formatCurrency(calc.taxRub + calc.forceMajeureRub)}</div>
                                   <div className="text-[10px] text-cyan-400/90 mt-1 font-mono">
-                                    УСН {prod.taxPercent}% от {formatCurrency(calc.taxPrice)}: {formatCurrency(calc.taxRub)}
+                                    УСН {prod.taxPercent}%: {formatCurrency(calc.taxRub)}
                                   </div>
                                 </div>
                               </div>
 
                               {/* Warehouse & Official Ozon Logistics Details Bar */}
-                              <div className="p-3 rounded-xl bg-[#080b11] border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs">
+                              <div className="p-3 rounded-xl bg-[#080c16] border border-white/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs">
                                 <div className="flex flex-wrap items-center gap-2.5">
                                   <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                                     <Building2 className="w-3.5 h-3.5" />

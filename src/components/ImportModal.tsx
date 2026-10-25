@@ -97,12 +97,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#080b11]/85 backdrop-blur-xl animate-in fade-in duration-200">
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_25px_50px_-12px_rgba(0,0,0,0.8)]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#090d16]/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_25px_50px_-12px_rgba(0,0,0,0.8)]">
         {/* Modal Header */}
-        <div className="p-5 border-b border-white/[0.06] flex items-center justify-between bg-[#0a0f19]">
+        <div className="p-5 border-b border-white/[0.06] flex items-center justify-between bg-[#0e1424]">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
+            <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/20">
               <FileSpreadsheet className="w-5 h-5 stroke-[2.2]" />
             </div>
             <div>
@@ -411,7 +411,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4.5 border-t border-white/[0.06] bg-[#0a0f19] flex items-center justify-between">
+        <div className="p-4.5 border-t border-white/[0.06] bg-[#0e1424] flex items-center justify-between">
           {step === 'mapping' ? (
             <button
               onClick={() => setStep('upload')}
@@ -434,7 +434,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             {step === 'mapping' && (
               <button
                 onClick={handleFinalImport}
-                className="flex items-center gap-2 px-5 py-2 text-xs font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.25)] cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-all shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_16px_rgba(79,70,229,0.3)] cursor-pointer"
               >
                 <span>Импортировать {rawRows.length} позиций</span>
                 <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />

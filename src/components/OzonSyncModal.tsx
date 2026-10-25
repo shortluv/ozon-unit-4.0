@@ -388,13 +388,13 @@ export const OzonSyncModal: React.FC<OzonSyncModalProps> = ({
   const calculatedDim = calculateOzonDimensionsLogistics(dimLength, dimWidth, dimHeight, dimPrice);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-5xl bg-[#0c111c] border border-white/[0.1] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#090d16]/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-5xl bg-[#0d121f] border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#0e1524]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-[#0e1424]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-              <RefreshCw className="w-5 h-5 text-blue-400 stroke-[2.2]" />
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+              <RefreshCw className="w-5 h-5 text-indigo-400 stroke-[2.2]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -420,12 +420,12 @@ export const OzonSyncModal: React.FC<OzonSyncModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center px-6 pt-2 border-b border-white/[0.06] bg-[#0c111c] gap-2 overflow-x-auto">
+        <div className="flex items-center px-6 pt-2 border-b border-white/[0.06] bg-[#0d121f] gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('api')}
             className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'api'
-                ? 'border-blue-400 text-blue-300 font-semibold'
+                ? 'border-indigo-500 text-indigo-300 font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -454,7 +454,7 @@ export const OzonSyncModal: React.FC<OzonSyncModalProps> = ({
             onClick={() => setActiveTab('tariffs')}
             className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'tariffs'
-                ? 'border-blue-400 text-blue-300 font-semibold'
+                ? 'border-indigo-500 text-indigo-300 font-semibold'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >

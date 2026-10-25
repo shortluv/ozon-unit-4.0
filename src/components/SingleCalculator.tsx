@@ -133,8 +133,8 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Product Switcher & Presets Strip (Uptic style) */}
-      <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-4.5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+      {/* Product Switcher & Presets Strip (Mercury style) */}
+      <div className="bg-[#0e1424] border border-white/[0.08] rounded-xl p-4.5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
         <div className="flex items-center gap-3">
           <label className="text-xs text-slate-400 whitespace-nowrap font-medium">Товар для детального расчета:</label>
           <select
@@ -143,7 +143,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
               const found = products.find((p) => p.id === e.target.value);
               if (found) setForm(found);
             }}
-            className="text-xs font-semibold bg-[#080b11] border border-white/[0.08] text-white rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500/60 max-w-sm truncate cursor-pointer shadow-sm"
+            className="text-xs font-semibold bg-[#080c16] border border-white/[0.08] text-white rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500 max-w-sm truncate cursor-pointer shadow-sm"
           >
             {products.map((p) => (
               <option key={p.id} value={p.id}>
@@ -156,13 +156,13 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
         {/* Presets */}
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs text-slate-400 flex items-center gap-1 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Шаблон:
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Шаблон:
           </span>
           {MARKETPLACE_PRESETS.map((pr) => (
             <button
               key={pr.id}
               onClick={() => applyPreset(pr.id)}
-              className="text-xs px-3 py-1.5 rounded-xl border border-white/[0.08] bg-[#080b11] hover:bg-white/[0.06] text-slate-300 transition-all cursor-pointer shadow-sm"
+              className="text-xs px-3 py-1.5 rounded-lg border border-white/[0.08] bg-[#080c16] hover:bg-white/[0.06] text-slate-300 transition-all cursor-pointer shadow-sm"
             >
               {pr.name}
             </button>
@@ -178,7 +178,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
           
           {/* Ozon API Transparency Banner */}
           {form.syncMeta && (
-            <div className="bg-[#0e1420] border border-blue-500/25 rounded-2xl p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] text-xs space-y-2">
+            <div className="bg-[#0e1424] border border-blue-500/25 rounded-xl p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)] text-xs space-y-2">
               <div className="flex items-center justify-between text-[11px] border-b border-white/[0.06] pb-2">
                 <span className="font-semibold text-blue-300 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -191,28 +191,28 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                 )}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-                <div className="p-2 bg-[#080b11] rounded-lg border border-white/[0.04]">
+                <div className="p-2 bg-[#080c16] rounded-lg border border-white/[0.04]">
                   <span className="text-slate-400 block text-[10px]">1. Предельная цена:</span>
                   <span className="font-mono text-emerald-400 font-bold">{form.retailPrice} ₽</span>
                   <div className="text-[9px] text-slate-500 truncate" title={form.syncMeta.limitPriceMeta?.message}>
                     {form.syncMeta.limitPriceMeta?.fieldUsed || 'price.min_price'}
                   </div>
                 </div>
-                <div className="p-2 bg-[#080b11] rounded-lg border border-white/[0.04]">
+                <div className="p-2 bg-[#080c16] rounded-lg border border-white/[0.04]">
                   <span className="text-slate-400 block text-[10px]">2. Цена реализации:</span>
                   <span className="font-mono text-cyan-300 font-bold">{form.taxPrice} ₽</span>
                   <div className="text-[9px] text-slate-500 truncate" title={form.syncMeta.realizationPriceMeta?.message}>
                     {form.syncMeta.realizationPriceMeta?.fieldUsed || 'marketing_seller_price'}
                   </div>
                 </div>
-                <div className="p-2 bg-[#080b11] rounded-lg border border-white/[0.04]">
+                <div className="p-2 bg-[#080c16] rounded-lg border border-white/[0.04]">
                   <span className="text-slate-400 block text-[10px]">3. Литраж:</span>
                   <span className="font-mono text-amber-300 font-bold">{form.volumeLiters} л</span>
                   <div className="text-[9px] text-slate-500 truncate" title={form.syncMeta.volumeMeta?.message}>
                     {form.contentVolume ? form.contentVolume.raw : form.syncMeta.volumeMeta?.fieldUsed || 'атрибут'}
                   </div>
                 </div>
-                <div className="p-2 bg-[#080b11] rounded-lg border border-white/[0.04]">
+                <div className="p-2 bg-[#080c16] rounded-lg border border-white/[0.04]">
                   <span className="text-slate-400 block text-[10px]">4. ДРР:</span>
                   <span className="font-mono text-pink-300 font-bold">{form.adSpendPercent}%</span>
                   <div className="text-[9px] text-slate-500 truncate" title={form.syncMeta.drrMeta?.message}>
@@ -223,25 +223,25 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
           )}
 
-          {/* 5 PRIMARY INPUTS CONTAINER */}
-          <div className="bg-[#0e1420] border-2 border-emerald-500/40 rounded-2xl p-6 space-y-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06),0_8px_30px_rgb(0_0_0_/_40%)]">
+          {/* 5 PRIMARY INPUTS CONTAINER (Mercury Fintech Styling) */}
+          <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-6 space-y-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                <span className="flex h-2 w-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
                 <h2 className="text-sm font-bold text-white tracking-wide">
                   5 Ключевых параметров для ввода (включая цену реализации)
                 </h2>
               </div>
-              <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/30 font-medium">
+              <span className="text-[11px] font-mono text-indigo-300 bg-indigo-500/10 px-2.5 py-0.5 rounded-md border border-indigo-500/20 font-medium">
                 мгновенный авторасчет
               </span>
             </div>
 
             {/* 1. Предельная цена реализации */}
-            <div className="space-y-2 bg-[#080b11] p-4 rounded-xl border border-emerald-500/20">
+            <div className="space-y-2 bg-[#080c16] p-4 rounded-xl border border-white/[0.08] hover:border-indigo-500/30 transition-colors">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-emerald-400 flex items-center gap-1.5">
-                  <Tag className="w-4 h-4" /> 1. Предельная цена реализации
+                <span className="font-semibold text-white flex items-center gap-1.5">
+                  <Tag className="w-4 h-4 text-indigo-400" /> 1. Предельная цена реализации
                 </span>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-slate-400">Ввод:</span>
@@ -251,7 +251,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                     min="1"
                     value={form.retailPrice}
                     onChange={(e) => setForm({ ...form, retailPrice: Number(e.target.value) })}
-                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#121929] border border-emerald-500/50 rounded-lg text-emerald-300 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#0e1424] border border-white/[0.12] rounded-lg text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
                   />
                   <span className="text-xs text-slate-400 font-mono">₽</span>
                 </div>
@@ -290,9 +290,9 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* 2. Цена реализации для налога */}
-            <div className="space-y-2 bg-[#080b11] p-4 rounded-xl border border-cyan-500/30">
+            <div className="space-y-2 bg-[#080c16] p-4 rounded-xl border border-white/[0.08] hover:border-cyan-500/30 transition-colors">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-cyan-300 flex items-center gap-1.5">
+                <span className="font-semibold text-white flex items-center gap-1.5">
                   <Tag className="w-4 h-4 text-cyan-400" /> 2. Цена реализации (база налога УСН)
                 </span>
                 <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                     min="1"
                     value={form.taxPrice ?? form.retailPrice}
                     onChange={(e) => setForm({ ...form, taxPrice: Number(e.target.value) })}
-                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#121929] border border-cyan-500/50 rounded-lg text-cyan-200 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#0e1424] border border-white/[0.12] rounded-lg text-cyan-300 focus:outline-none focus:border-cyan-400"
                   />
                   <span className="text-xs text-slate-400 font-mono">₽</span>
                 </div>
@@ -327,9 +327,9 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* 3. Закупка / себестоимость */}
-            <div className="space-y-2 bg-[#080b11] p-4 rounded-xl border border-blue-500/20">
+            <div className="space-y-2 bg-[#080c16] p-4 rounded-xl border border-white/[0.08] hover:border-blue-500/30 transition-colors">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-blue-300 flex items-center gap-1.5">
+                <span className="font-semibold text-white flex items-center gap-1.5">
                   <DollarSign className="w-4 h-4 text-blue-400" /> 3. Закупка / себестоимость
                 </span>
                 <div className="flex items-center gap-2">
@@ -340,7 +340,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                     min="0"
                     value={form.cogs}
                     onChange={(e) => setForm({ ...form, cogs: Number(e.target.value) })}
-                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#121929] border border-blue-500/50 rounded-lg text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    className="w-24 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#0e1424] border border-white/[0.12] rounded-lg text-blue-300 focus:outline-none focus:border-blue-400"
                   />
                   <span className="text-xs text-slate-400 font-mono">₽</span>
                 </div>
@@ -364,9 +364,9 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* 4. Литраж */}
-            <div className="space-y-2 bg-[#080b11] p-4 rounded-xl border border-amber-500/20">
+            <div className="space-y-2 bg-[#080c16] p-4 rounded-xl border border-white/[0.08] hover:border-amber-500/30 transition-colors">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-amber-300 flex items-center gap-1.5">
+                <span className="font-semibold text-white flex items-center gap-1.5">
                   <Box className="w-4 h-4 text-amber-400" /> 4. Литраж упаковки
                 </span>
                 <div className="flex items-center gap-2">
@@ -384,7 +384,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                     min="0.01"
                     value={form.volumeLiters}
                     onChange={(e) => setForm({ ...form, volumeLiters: Number(e.target.value) })}
-                    className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-[#121929] border border-amber-500/50 rounded-lg text-amber-200 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                    className="w-20 px-2 py-1 text-right font-mono font-bold text-sm bg-[#0e1424] border border-white/[0.12] rounded-lg text-amber-300 focus:outline-none focus:border-amber-400"
                   />
                   <span className="text-xs text-slate-400 font-mono">л</span>
                 </div>
@@ -408,7 +408,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
 
               {/* Dimensions Helper Popover */}
               {showDimensionHelper && (
-                <div className="mt-3 p-3.5 bg-[#101625] border border-amber-500/30 rounded-xl space-y-2.5 shadow-inner">
+                <div className="mt-3 p-3.5 bg-[#0e1424] border border-amber-500/30 rounded-xl space-y-2.5 shadow-inner">
                   <div className="text-[11px] font-semibold text-amber-300">Расчет литража из физических габаритов коробки:</div>
                   <div className="grid grid-cols-3 gap-2.5">
                     <div>
@@ -417,7 +417,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                         type="number"
                         value={dimL}
                         onChange={(e) => setDimL(Number(e.target.value))}
-                        className="w-full p-1.5 text-xs bg-[#080b11] border border-white/[0.08] rounded-lg text-center text-white font-mono"
+                        className="w-full p-1.5 text-xs bg-[#080c16] border border-white/[0.08] rounded-lg text-center text-white font-mono"
                       />
                     </div>
                     <div>
@@ -426,7 +426,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                         type="number"
                         value={dimW}
                         onChange={(e) => setDimW(Number(e.target.value))}
-                        className="w-full p-1.5 text-xs bg-[#080b11] border border-white/[0.08] rounded-lg text-center text-white font-mono"
+                        className="w-full p-1.5 text-xs bg-[#080c16] border border-white/[0.08] rounded-lg text-center text-white font-mono"
                       />
                     </div>
                     <div>
@@ -435,7 +435,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                         type="number"
                         value={dimH}
                         onChange={(e) => setDimH(Number(e.target.value))}
-                        className="w-full p-1.5 text-xs bg-[#080b11] border border-white/[0.08] rounded-lg text-center text-white font-mono"
+                        className="w-full p-1.5 text-xs bg-[#080c16] border border-white/[0.08] rounded-lg text-center text-white font-mono"
                       />
                     </div>
                   </div>
@@ -456,9 +456,9 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* 5. Процент рекламы */}
-            <div className="space-y-2 bg-[#080b11] p-4 rounded-xl border border-pink-500/20">
+            <div className="space-y-2 bg-[#080c16] p-4 rounded-xl border border-white/[0.08] hover:border-pink-500/30 transition-colors">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-semibold text-pink-300 flex items-center gap-1.5">
+                <span className="font-semibold text-white flex items-center gap-1.5">
                   <Percent className="w-4 h-4 text-pink-400" /> 5. Процент рекламы (ДРР %)
                 </span>
                 <div className="flex items-center gap-2">
@@ -470,7 +470,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                     max="100"
                     value={form.adSpendPercent}
                     onChange={(e) => setForm({ ...form, adSpendPercent: Number(e.target.value) })}
-                    className="w-20 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#121929] border border-pink-500/50 rounded-lg text-pink-200 focus:outline-none focus:ring-1 focus:ring-pink-400"
+                    className="w-20 px-2.5 py-1 text-right font-mono font-bold text-sm bg-[#0e1424] border border-white/[0.12] rounded-lg text-pink-300 focus:outline-none focus:border-pink-400"
                   />
                   <span className="text-xs text-slate-400 font-mono">%</span>
                 </div>
@@ -495,17 +495,17 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
           </div>
 
           {/* ADVANCED SETTINGS ACCORDION */}
-          <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+          <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-4.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
               className="w-full flex items-center justify-between text-xs text-slate-300 hover:text-white transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 font-semibold">
-                <Settings2 className="w-4 h-4 text-slate-400" />
+                <Settings2 className="w-4 h-4 text-indigo-400" />
                 <span>Тарифные константы маркетплейса (из Excel таблицы)</span>
               </div>
-              <span className="text-[11px] text-slate-500 underline flex items-center gap-1">
+              <span className="text-[11px] text-slate-400 flex items-center gap-1 hover:text-indigo-300">
                 {showAdvanced ? 'Свернуть' : 'Развернуть параметры'}
                 {showAdvanced ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
               </span>
@@ -520,7 +520,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       type="number"
                       value={form.fulfillmentFixed}
                       onChange={(e) => setForm({ ...form, fulfillmentFixed: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -530,7 +530,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       step="0.01"
                       value={form.crossDockFixed}
                       onChange={(e) => setForm({ ...form, crossDockFixed: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -539,7 +539,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       type="number"
                       value={form.taxPercent}
                       onChange={(e) => setForm({ ...form, taxPercent: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -549,7 +549,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       step="0.1"
                       value={form.lastMilePercent}
                       onChange={(e) => setForm({ ...form, lastMilePercent: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -559,7 +559,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       step="0.1"
                       value={form.acquiringPercent}
                       onChange={(e) => setForm({ ...form, acquiringPercent: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -568,7 +568,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       type="number"
                       value={form.plannedSalesUnits}
                       onChange={(e) => setForm({ ...form, plannedSalesUnits: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -580,7 +580,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       type="number"
                       value={form.commissionUnder300}
                       onChange={(e) => setForm({ ...form, commissionUnder300: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                   <div>
@@ -589,7 +589,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                       type="number"
                       value={form.commissionOver300}
                       onChange={(e) => setForm({ ...form, commissionOver300: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 font-mono bg-[#080b11] border border-white/[0.08] rounded-lg text-slate-200"
+                      className="w-full px-2.5 py-1.5 font-mono bg-[#080c16] border border-white/[0.08] rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 </div>
@@ -601,20 +601,20 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={handleSave}
-              className="flex-1 py-3 px-4 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_0_20px_rgba(16,185,129,0.25)]"
+              className="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.3),0_4px_16px_rgba(79,70,229,0.3)]"
             >
               <Save className="w-4 h-4" /> Сохранить изменения в каталог
             </button>
             <button
               onClick={handleSaveNew}
-              className="py-3 px-4 bg-[#141b2b] hover:bg-[#1a2338] text-white font-medium border border-white/[0.08] rounded-xl text-xs transition-all cursor-pointer shadow-sm"
+              className="py-3 px-4 bg-[#0e1424] hover:bg-[#141b2f] text-slate-200 font-medium border border-white/[0.08] rounded-xl text-xs transition-all cursor-pointer shadow-sm"
             >
               Сохранить как копию
             </button>
           </div>
 
           {saveSuccessMsg && (
-            <div className="p-3 bg-emerald-500/15 border border-emerald-500/40 rounded-xl text-xs text-emerald-300 flex items-center gap-2 shadow-sm">
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-xs text-emerald-300 flex items-center gap-2 shadow-sm">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               <span>{saveSuccessMsg}</span>
             </div>
@@ -625,7 +625,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
         <div className="lg:col-span-5 space-y-6">
 
           {/* Main Profit Card */}
-          <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+          <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-slate-400">Чистая прибыль с 1 шт:</span>
               <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
@@ -652,7 +652,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3.5 bg-[#080b11] rounded-xl border border-white/[0.06]">
+              <div className="p-3.5 bg-[#080c16] rounded-xl border border-white/[0.06]">
                 <span className="text-slate-400 block mb-0.5">Маржинальность:</span>
                 <span className={`text-xl font-bold font-mono tabular-nums ${
                   calc.marginPercent >= 20 ? 'text-emerald-400' : calc.marginPercent >= 10 ? 'text-amber-400' : 'text-rose-400'
@@ -660,7 +660,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
                   {formatPercent(calc.marginPercent)}
                 </span>
               </div>
-              <div className="p-3.5 bg-[#080b11] rounded-xl border border-white/[0.06]">
+              <div className="p-3.5 bg-[#080c16] rounded-xl border border-white/[0.06]">
                 <span className="text-slate-400 block mb-0.5">Рентабельность ROI:</span>
                 <span className={`text-xl font-bold font-mono tabular-nums ${
                   calc.roiPercent >= 25 ? 'text-emerald-400' : calc.roiPercent >= 0 ? 'text-amber-400' : 'text-rose-400'
@@ -672,14 +672,14 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
           </div>
 
           {/* Visual Cost Cascade (Waterfall) */}
-          <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+          <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-6 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-white">Каскад выручки: куда уходят деньги</span>
               <span className="font-mono text-emerald-400 font-bold tabular-nums">+{formatCurrency(calc.retailPrice)}</span>
             </div>
 
             {/* Visual stacked bar */}
-            <div className="h-4 w-full rounded-lg overflow-hidden flex bg-[#080b11] border border-white/[0.08]">
+            <div className="h-4 w-full rounded-lg overflow-hidden flex bg-[#080c16] border border-white/[0.08]">
               <div style={{ width: `${pctCogs}%` }} className="bg-blue-500" title={`Закупка: ${formatCurrency(calc.cogs)}`} />
               <div style={{ width: `${pctLogistics}%` }} className="bg-amber-500" title={`Логистика: ${formatCurrency(calc.totalLogisticsRub)}`} />
               <div style={{ width: `${pctCommission}%` }} className="bg-purple-500" title={`Комиссия: ${formatCurrency(calc.commissionRub)}`} />
@@ -751,13 +751,13 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
           </div>
 
           {/* Strategic Safety Limits */}
-          <div className="bg-[#0e1420] border border-white/[0.08] rounded-2xl p-6 space-y-3.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+          <div className="bg-[#0e1424] border border-white/[0.08] rounded-2xl p-6 space-y-3.5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]">
             <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
               Пороги безопасности для маркетинга и цен
             </h3>
 
             {/* Break-even */}
-            <div className="p-3.5 bg-[#080b11] border border-white/[0.06] rounded-xl flex items-center justify-between">
+            <div className="p-3.5 bg-[#080c16] border border-white/[0.06] rounded-xl flex items-center justify-between">
               <div>
                 <div className="text-xs font-semibold text-white">Точка безубыточности</div>
                 <div className="text-[11px] text-slate-400">Минимальная цена продажи в ноль</div>
@@ -773,7 +773,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* Max Allowable Ad Percent */}
-            <div className="p-3.5 bg-[#080b11] border border-white/[0.06] rounded-xl flex items-center justify-between">
+            <div className="p-3.5 bg-[#080c16] border border-white/[0.06] rounded-xl flex items-center justify-between">
               <div>
                 <div className="text-xs font-semibold text-white">Предельный % рекламы</div>
                 <div className="text-[11px] text-slate-400">Максимальный ДРР до ухода в минус</div>
@@ -789,7 +789,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             </div>
 
             {/* Monthly projection */}
-            <div className="p-3.5 bg-[#080b11] border border-white/[0.06] rounded-xl flex items-center justify-between">
+            <div className="p-3.5 bg-[#080c16] border border-white/[0.06] rounded-xl flex items-center justify-between">
               <div>
                 <div className="text-xs font-semibold text-white">План на месяц ({form.plannedSalesUnits} шт)</div>
                 <div className="text-[11px] text-slate-400">

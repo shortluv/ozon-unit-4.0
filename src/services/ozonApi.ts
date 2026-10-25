@@ -256,89 +256,119 @@ export async function callOzonApi<T>(
   const baseProxy = credentials.customProxyUrl?.trim() || '/api/ozon';
   const cleanBase = baseProxy.replace(/\/+$/, '');
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${cleanBase}${cleanEndpoint}`;
+  const trimmedEndpoint = cleanEndpoint.replace(/^\/+/, '');
+
+  // Основной и резервный URL для вызова прокси:
+  // Для /api/ozon формат с ?path=... гарантированно маршрутизируется Vercel в Serverless Function api/ozon/index.js,
+  // исключая 404 router ошибки несовпадения сегментов [...path].js на Vite.
+  // При этом если хост настроен через rewrite, поддерживается и прямой путь.
+  const isDefaultProxy = cleanBase === '/api/ozon' || cleanBase.endsWith('/api/ozon');
+  const targetUrls = isDefaultProxy
+    ? [`${cleanBase}?path=${trimmedEndpoint}`, `${cleanBase}${cleanEndpoint}`]
+    : [`${cleanBase}${cleanEndpoint}`];
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Client-Id': cId,
-          'Api-Key': aKey,
-        },
-        body: JSON.stringify(body),
-      });
+    for (const url of targetUrls) {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Client-Id': cId,
+            'Api-Key': aKey,
+          },
+          body: JSON.stringify(body),
+        });
 
-      // Обработка 429 (Rate Limit) с повтором
-      if (response.status === 429 && attempt < maxRetries) {
-        await waitDelay(600 * (attempt + 1));
-        continue;
-      }
-
-      // Обработка 5xx ошибок сервера Ozon с повтором
-      if (response.status >= 500 && response.status < 600 && attempt < maxRetries) {
-        await waitDelay(800 * (attempt + 1));
-        continue;
-      }
-
-      if (!response.ok) {
-        let errDetail = `HTTP ${response.status}: ${response.statusText}`;
-        let parsedMessage: string | null = null;
-        let isHtmlResponse = false;
-
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('text/html')) {
-          isHtmlResponse = true;
+        // Обработка 429 (Rate Limit) с повтором
+        if (response.status === 429 && attempt < maxRetries) {
+          await waitDelay(600 * (attempt + 1));
+          continue;
         }
 
+        // Обработка 5xx ошибок сервера Ozon с повтором
+        if (response.status >= 500 && response.status < 600 && attempt < maxRetries) {
+          await waitDelay(800 * (attempt + 1));
+          continue;
+        }
+
+        let isHtmlResponse = false;
+        let rawText = '';
         try {
-          const text = await response.text();
-          if (text.trim().startsWith('<') || text.includes('<!DOCTYPE') || text.includes('<html')) {
+          rawText = await response.text();
+          if (rawText.trim().startsWith('<') || rawText.includes('<!DOCTYPE') || rawText.includes('<html')) {
             isHtmlResponse = true;
-          } else {
-            const errorJson = JSON.parse(text);
-            if (errorJson.message) {
-              parsedMessage = errorJson.message;
-            } else if (errorJson.error?.message) {
-              parsedMessage = errorJson.error.message;
-            } else if (errorJson.details?.[0]?.message) {
-              parsedMessage = errorJson.details[0].message;
-            }
           }
         } catch {
           // fallback
         }
 
-        if (parsedMessage) {
-          errDetail = parsedMessage;
-        } else if (response.status === 401) {
-          errDetail = `Ошибка авторизации (401). Неверный Client-Id (${cId}) или Api-Key. Проверьте правильность копирования из Ozon Seller.`;
-        } else if (response.status === 403) {
-          errDetail = `Ошибка доступа (403 Forbidden). Убедитесь, что ключ создан с ролью «Администратор (только чтение)» (Admin Read-Only) и активирован в кабинете Ozon Seller.`;
-        } else if (response.status === 404) {
-          if (isHtmlResponse) {
-            errDetail = `Прокси-маршрут /api/ozon не найден на сервере (HTTP 404 HTML). Запрос к ${endpoint} не был перенаправлен в Ozon. ` +
-              `Если проект запущен на Vercel, убедитесь, что в Git-репозиторий отправлены файлы vercel.json и api/ozon/[...path].ts.`;
-          } else {
-            errDetail = `Метод или ресурс API не найден (HTTP 404 Not Found). Запрос к ${endpoint} не найден на сервере Ozon.`;
+        // Если это 404 от Vercel (NOT_FOUND / HTML), и у нас есть резервный формат URL — пробуем резервный
+        if (response.status === 404 && (isHtmlResponse || rawText.includes('NOT_FOUND') || !rawText.trim().startsWith('{'))) {
+          if (targetUrls.indexOf(url) < targetUrls.length - 1) {
+            continue; // Пробуем следующий URL из targetUrls
           }
-        } else if (response.status === 429) {
-          errDetail = `Превышен лимит частоты запросов Ozon API (429 Too Many Requests). Попробуйте повторить через несколько секунд.`;
         }
 
-        return { success: false, status: response.status, error: errDetail };
-      }
+        if (!response.ok) {
+          let errDetail = `HTTP ${response.status}: ${response.statusText}`;
+          let parsedMessage: string | null = null;
 
-      const json = await response.json();
-      return { success: true, status: response.status, data: json as T };
-    } catch (err: unknown) {
-      if (attempt < maxRetries) {
-        await waitDelay(500 * (attempt + 1));
-        continue;
+          if (!isHtmlResponse && rawText.trim().startsWith('{')) {
+            try {
+              const errorJson = JSON.parse(rawText);
+              if (errorJson.message) {
+                parsedMessage = errorJson.message;
+              } else if (errorJson.error?.message) {
+                parsedMessage = errorJson.error.message;
+              } else if (errorJson.details?.[0]?.message) {
+                parsedMessage = errorJson.details[0].message;
+              }
+            } catch {
+              // fallback
+            }
+          }
+
+          if (parsedMessage) {
+            errDetail = parsedMessage;
+          } else if (response.status === 401) {
+            errDetail = `Ошибка авторизации (401). Неверный Client-Id (${cId}) или Api-Key. Проверьте правильность копирования из Ozon Seller.`;
+          } else if (response.status === 403) {
+            errDetail = `Ошибка доступа (403 Forbidden). Убедитесь, что ключ создан с ролью «Администратор (только чтение)» (Admin Read-Only) и активирован в кабинете Ozon Seller.`;
+          } else if (response.status === 404) {
+            if (isHtmlResponse || rawText.includes('NOT_FOUND') || !rawText.trim().startsWith('{')) {
+              errDetail = `Прокси-маршрут /api/ozon не найден на хостинге Vercel (HTTP 404). Запрос к ${endpoint} не был перенаправлен в Ozon. ` +
+                `Проверьте vercel.json: маршрут должен направлять "/api/ozon/:path*" на "/api/ozon?path=:path*".`;
+            } else {
+              errDetail = `Метод или ресурс API не найден (HTTP 404 Not Found). Запрос к ${endpoint} вернул 404 на сервере Ozon.`;
+            }
+          } else if (response.status === 429) {
+            errDetail = `Превышен лимит частоты запросов Ozon API (429 Too Many Requests). Попробуйте повторить через несколько секунд.`;
+          }
+
+          return { success: false, status: response.status, error: errDetail };
+        }
+
+        let json: unknown = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch {
+          json = rawText;
+        }
+        return { success: true, status: response.status, data: json as T };
+      } catch (err: unknown) {
+        if (targetUrls.indexOf(url) < targetUrls.length - 1) {
+          continue;
+        }
+        if (attempt < maxRetries) {
+          await waitDelay(500 * (attempt + 1));
+          continue;
+        }
+        return {
+          success: false,
+          error: `Сетевая ошибка при обращении к Ozon API: ${err instanceof Error ? err.message : String(err)}`,
+        };
       }
-      const message = err instanceof Error ? err.message : 'Сетевая ошибка при запросе к Ozon API';
-      return { success: false, error: message };
     }
   }
 
@@ -363,7 +393,7 @@ export async function fetchOzonWarehouses(credentials: OzonCredentials): Promise
   const res = await callOzonApi<{ result?: OzonWarehouse[] }>(
     '/v1/warehouse/list',
     {},
-    { clientId: cId, apiKey: aKey }
+    { ...credentials, clientId: cId, apiKey: aKey }
   );
 
   const warehouses = extractItems<OzonWarehouse>(res.data);
@@ -404,6 +434,12 @@ export async function testOzonConnection(credentials: OzonCredentials): Promise<
   let productsSuccess = false;
   let lastError = '';
 
+  const activeCreds: OzonCredentials = {
+    ...credentials,
+    clientId: cId,
+    apiKey: aKey,
+  };
+
   const v3Res = await callOzonApi<{
     result?: { items?: unknown[]; total?: number; last_id?: string };
     items?: unknown[];
@@ -415,7 +451,7 @@ export async function testOzonConnection(credentials: OzonCredentials): Promise<
       last_id: '',
       limit: 1,
     },
-    { clientId: cId, apiKey: aKey }
+    activeCreds
   );
 
   if (v3Res.success && v3Res.data) {
@@ -433,7 +469,7 @@ export async function testOzonConnection(credentials: OzonCredentials): Promise<
         filter: { visibility: 'ALL' },
         limit: 1,
       },
-      { clientId: cId, apiKey: aKey }
+      activeCreds
     );
 
     if (v2Res.success && v2Res.data) {
