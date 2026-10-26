@@ -1,4 +1,4 @@
-import { MarketplacePreset, ProductUnitData, UnitEconomicsResult } from '../types/unitEconomics';
+import { MarketplacePreset, ProductUnitData, UnitEconomicsResult, TaxRegimeConfig } from '../types/unitEconomics';
 
 export const MARKETPLACE_PRESETS: MarketplacePreset[] = [
   {
@@ -42,6 +42,153 @@ export const MARKETPLACE_PRESETS: MarketplacePreset[] = [
   },
 ];
 
+// ========================================================
+// НАЛОГОВЫЕ ПРОФИЛИ РФ И РЕФОРМА НДС 2025/2026
+// ========================================================
+export const DEFAULT_TAX_CONFIG: TaxRegimeConfig = {
+  system: 'usn_income',
+  ratePercent: 11,
+  entityType: 'ip',
+  vatMode: 'exempt',
+  vatRate: 0,
+  vatIncludedInPrice: true,
+  hasEmployees: false,
+  annualRevenueBracket: 'under_60m',
+  insuranceDeductionPercent: 0,
+  notes: 'УСН «Доходы» 11% (Базовый профиль магазина)',
+};
+
+export const STANDARD_TAX_REGIMES: { id: string; name: string; config: TaxRegimeConfig; description: string }[] = [
+  {
+    id: 'usn_income_11',
+    name: 'УСН «Доходы» 11% (Базовый профиль магазина)',
+    config: {
+      system: 'usn_income',
+      ratePercent: 11,
+      entityType: 'ip',
+      vatMode: 'exempt',
+      vatRate: 0,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: 'under_60m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'УСН 11% от цены реализации со скидкой продавца',
+  },
+  {
+    id: 'usn_income_6',
+    name: 'УСН «Доходы» 6% (Стандарт РФ, доход до 60 млн ₽)',
+    config: {
+      system: 'usn_income',
+      ratePercent: 6,
+      entityType: 'ip',
+      vatMode: 'exempt',
+      vatRate: 0,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: 'under_60m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Стандартная ставка УСН 6%, освобождение от НДС по ст. 145 НК РФ',
+  },
+  {
+    id: 'usn_income_expense_15',
+    name: 'УСН «Доходы минус расходы» 15% (Мин. налог 1%)',
+    config: {
+      system: 'usn_income_expense',
+      ratePercent: 15,
+      entityType: 'ip',
+      vatMode: 'exempt',
+      vatRate: 0,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: 'under_60m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Налог 15% с разницы доходов и расходов (с контролем мин. налога 1% от выручки)',
+  },
+  {
+    id: 'usn_2025_vat5',
+    name: 'УСН 6% + НДС 5% (Реформа 2025: доход 60–250 млн ₽)',
+    config: {
+      system: 'usn_income',
+      ratePercent: 6,
+      entityType: 'ip',
+      vatMode: 'special_5',
+      vatRate: 5,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: '60m_to_250m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Реформа НДС 2025 г.: пониженная ставка 5% без вычета входящего налога + УСН 6%',
+  },
+  {
+    id: 'usn_2025_vat7',
+    name: 'УСН 6% + НДС 7% (Реформа 2025: доход 250–450 млн ₽)',
+    config: {
+      system: 'usn_income',
+      ratePercent: 6,
+      entityType: 'ip',
+      vatMode: 'special_7',
+      vatRate: 7,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: '250m_to_450m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Реформа НДС 2025 г.: пониженная ставка 7% без вычета входящего налога + УСН 6%',
+  },
+  {
+    id: 'osno_20',
+    name: 'ОСНО (Налог на прибыль 20% + НДС 20%)',
+    config: {
+      system: 'osno',
+      ratePercent: 20,
+      entityType: 'ooo',
+      vatMode: 'standard_20',
+      vatRate: 20,
+      vatIncludedInPrice: true,
+      hasEmployees: true,
+      annualRevenueBracket: 'over_450m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Общая система: НДС 20% + налог на прибыль 20% от операционной маржи',
+  },
+  {
+    id: 'ausn_8',
+    name: 'АУСН «Доходы» 8% (Нулевые взносы)',
+    config: {
+      system: 'ausn',
+      ratePercent: 8,
+      entityType: 'ip',
+      vatMode: 'exempt',
+      vatRate: 0,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: 'under_60m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Автоматизированная упрощенная система 8%, нулевые страховые взносы',
+  },
+  {
+    id: 'npd_self_employed',
+    name: 'НПД (Самозанятый) 6%',
+    config: {
+      system: 'npd',
+      ratePercent: 6,
+      entityType: 'self_employed',
+      vatMode: 'exempt',
+      vatRate: 0,
+      vatIncludedInPrice: true,
+      hasEmployees: false,
+      annualRevenueBracket: 'under_60m',
+      insuranceDeductionPercent: 0,
+    },
+    description: 'Налог на профессиональный доход при продажах через маркетплейс (юрлицу) — 6%',
+  },
+];
+
 export interface WarehouseOption {
   id: string;
   name: string;
@@ -64,7 +211,7 @@ export const STANDARD_WAREHOUSES: WarehouseOption[] = [
     logisticsMultiplier: 1.0,
     crossDockFixed: 1.63,
     fulfillmentFixed: 10,
-    description: 'Базовый эталонный кластер из вашей таблицы Excel (лист Тарифы)',
+    description: 'Базовый эталонный кластер Ozon (Центральный федеральный округ)',
   },
   {
     id: 'fbo_spb',
@@ -144,9 +291,12 @@ export function getLogisticsTariff(
 }
 
 /**
- * Точный расчет юнит-экономики по формулам из Excel файла пользователя
+ * Точный расчет юнит-экономики по регламенту Ozon 2025/2026 и правилам налогообложения РФ
  */
-export function calculateUnitEconomics(product: ProductUnitData): UnitEconomicsResult {
+export function calculateUnitEconomics(
+  product: ProductUnitData,
+  taxConfig?: TaxRegimeConfig
+): UnitEconomicsResult {
   const retailPrice = Math.max(0, product.retailPrice || 0);
   const cogs = Math.max(0, product.cogs || 0);
   const volumeLiters = Math.max(0.01, product.volumeLiters || 0.1);
@@ -185,10 +335,90 @@ export function calculateUnitEconomics(product: ProductUnitData): UnitEconomicsR
   // 9. Реклама (R = D * Q%)
   const adSpendRub = (retailPrice * adSpendPercent) / 100;
 
-  // 10. Налог 11% (S = E * 11%, если E пусто — берем D)
-  const taxPercent = product.taxPercent ?? 11;
+  // 10. Налогообложение (с поддержкой полной налоговой реформы РФ 2025/2026)
+  // taxBasePrice: цена реализации со скидкой продавца (столбец E)
   const taxBasePrice = product.taxPrice && product.taxPrice > 0 ? product.taxPrice : retailPrice;
-  const taxRub = (taxBasePrice * taxPercent) / 100;
+  
+  let taxRub = 0;
+  let taxRubBase = 0;
+  let vatRub = 0;
+  let taxSystemLabel = 'УСН «Доходы»';
+  let taxExplanation = '';
+
+  if (taxConfig) {
+    // 10.1. Расчет НДС (реформа 2025/2026 при превышении порога 60 млн ₽)
+    if (taxConfig.vatMode === 'special_5') {
+      vatRub = taxConfig.vatIncludedInPrice ? (retailPrice * 5) / 105 : (retailPrice * 0.05);
+      taxExplanation += 'НДС 5% (Реформа 2025: доход 60–250 млн ₽). ';
+    } else if (taxConfig.vatMode === 'special_7') {
+      vatRub = taxConfig.vatIncludedInPrice ? (retailPrice * 7) / 107 : (retailPrice * 0.07);
+      taxExplanation += 'НДС 7% (Реформа 2025: доход 250–450 млн ₽). ';
+    } else if (taxConfig.vatMode === 'standard_20') {
+      vatRub = taxConfig.vatIncludedInPrice ? (retailPrice * 20) / 120 : (retailPrice * 0.20);
+      taxExplanation += 'НДС 20% (Общий режим). ';
+    } else if (taxConfig.vatMode === 'preferential_10') {
+      vatRub = taxConfig.vatIncludedInPrice ? (retailPrice * 10) / 110 : (retailPrice * 0.10);
+      taxExplanation += 'НДС 10% (Льготная ставка). ';
+    }
+
+    vatRub = Math.round(vatRub * 100) / 100;
+    const priceNetOfVat = Math.max(0, retailPrice - vatRub);
+
+    // 10.2. Расчет налога по выбранной системе
+    switch (taxConfig.system) {
+      case 'usn_income': {
+        taxSystemLabel = `УСН «Доходы» ${taxConfig.ratePercent}%`;
+        taxRubBase = (taxBasePrice * taxConfig.ratePercent) / 100;
+        taxExplanation += `Налог ${taxRubBase.toFixed(1)} ₽ (${taxConfig.ratePercent}% от базы реализации ${taxBasePrice} ₽)`;
+        break;
+      }
+      case 'usn_income_expense': {
+        taxSystemLabel = `УСН «Доходы минус расходы» ${taxConfig.ratePercent}%`;
+        const directExpenses = cogs + totalLogisticsRub + commissionRub + fulfillmentRub + adSpendRub;
+        const profitBeforeTax = Math.max(0, taxBasePrice - directExpenses);
+        const standardTax = (profitBeforeTax * taxConfig.ratePercent) / 100;
+        const minTax = taxBasePrice * 0.01; // ст. 346.18 НК РФ: минимальный налог 1% от доходов
+        taxRubBase = Math.max(minTax, standardTax);
+        taxExplanation += standardTax < minTax
+          ? `Применен минимальный налог 1% (${minTax.toFixed(1)} ₽)`
+          : `Налог ${taxRubBase.toFixed(1)} ₽ (${taxConfig.ratePercent}% от разницы доходов и расходов)`;
+        break;
+      }
+      case 'osno': {
+        taxSystemLabel = 'ОСНО (Налог на прибыль 20% + НДС)';
+        const directExpenses = cogs + totalLogisticsRub + commissionRub + fulfillmentRub + adSpendRub;
+        const taxableProfit = Math.max(0, priceNetOfVat - directExpenses);
+        taxRubBase = (taxableProfit * (taxConfig.ratePercent || 20)) / 100;
+        taxExplanation += `Налог на прибыль 20% (${taxRubBase.toFixed(1)} ₽) + НДС (${vatRub.toFixed(1)} ₽)`;
+        break;
+      }
+      case 'ausn': {
+        taxSystemLabel = `АУСН ${taxConfig.ratePercent}%`;
+        taxRubBase = (taxBasePrice * taxConfig.ratePercent) / 100;
+        taxExplanation += `АУСН ${taxConfig.ratePercent}% (нулевые страховые взносы)`;
+        break;
+      }
+      case 'npd': {
+        taxSystemLabel = 'НПД (Самозанятый) 6%';
+        taxRubBase = (retailPrice * 0.06);
+        taxExplanation += 'НПД 6% при продаже юридическим лицам маркетплейса';
+        break;
+      }
+      default: {
+        taxSystemLabel = `УСН ${taxConfig.ratePercent}%`;
+        taxRubBase = (taxBasePrice * taxConfig.ratePercent) / 100;
+      }
+    }
+
+    taxRub = Math.round((taxRubBase + vatRub) * 100) / 100;
+  } else {
+    // Режим по умолчанию / обратная совместимость
+    const taxPercent = product.taxPercent ?? 11;
+    taxRub = Math.round(((taxBasePrice * taxPercent) / 100) * 100) / 100;
+    taxRubBase = taxRub;
+    taxSystemLabel = `УСН «Доходы» ${taxPercent}%`;
+    taxExplanation = `УСН ${taxPercent}% от цены реализации со скидкой продавца`;
+  }
 
   // 11. Форс-мажор 1% (T = D * 1%)
   const forceMajeurePercent = product.forceMajeurePercent ?? 1.0;
@@ -207,8 +437,9 @@ export function calculateUnitEconomics(product: ProductUnitData): UnitEconomicsR
 
   // 15. Точка безубыточности (Минимальная цена, при которой Прибыль = 0)
   // P - [Fixed + P * Var%] = 0 => P = Fixed / (1 - Var%)
+  const effectiveTaxPercent = taxBasePrice > 0 ? (taxRub / retailPrice) * 100 : 0;
   const fixedExpenses = baseLogisticsTariff + crossDockRub + ddvRub + lpRub + fulfillmentRub + cogs;
-  const variablePercent = lastMilePercent + acquiringPercent + appliedCommissionPercent + adSpendPercent + taxPercent + forceMajeurePercent;
+  const variablePercent = lastMilePercent + acquiringPercent + appliedCommissionPercent + adSpendPercent + effectiveTaxPercent + forceMajeurePercent;
   
   let breakEvenPrice = 0;
   if (variablePercent < 98) {
@@ -274,6 +505,10 @@ export function calculateUnitEconomics(product: ProductUnitData): UnitEconomicsR
     monthlyRevenue,
     monthlyTotalExpenses,
     monthlyNetProfit,
+    taxSystemLabel,
+    taxRubBase,
+    vatRub,
+    taxExplanation,
     status,
   };
 }

@@ -292,6 +292,83 @@ async function runAllTests() {
 
   assert(safePrice === 240, 'Сценарий 12: Розничная цена не затерлась нулем, сохранено 240 ₽');
 
+  // ---------------------------------------------------------------------------
+  // СЦЕНАРИЙ 13: Налоговые режимы РФ и реформа НДС 2025/2026
+  // ---------------------------------------------------------------------------
+  console.log('\n--- Сценарий 13: Налоговые режимы РФ и реформа НДС 2025/2026 ---');
+  const { calculateUnitEconomics } = await import('./src/utils/calculator');
+  const sampleTaxProduct: ProductUnitData = {
+    ...existingProduct12,
+    retailPrice: 1000,
+    taxPrice: 900,
+    cogs: 300,
+    volumeLiters: 0.5,
+    adSpendPercent: 10,
+    plannedSalesUnits: 100,
+  };
+
+  // 13.1. УСН Доходы 6%
+  const usn6Res = calculateUnitEconomics(sampleTaxProduct, {
+    system: 'usn_income',
+    ratePercent: 6,
+    entityType: 'ip',
+    vatMode: 'exempt',
+    vatRate: 0,
+    vatIncludedInPrice: true,
+    hasEmployees: false,
+    annualRevenueBracket: 'under_60m',
+    insuranceDeductionPercent: 0,
+  });
+  // 900 * 6% = 54 ₽
+  assert(usn6Res.taxRub === 54 && usn6Res.vatRub === 0, 'Сценарий 13.1: УСН Доходы 6% = 54 ₽ (без НДС)');
+
+  // 13.2. УСН 6% + НДС 5% (Реформа 2025 для выручки 60–250 млн ₽)
+  const usn2025Res = calculateUnitEconomics(sampleTaxProduct, {
+    system: 'usn_income',
+    ratePercent: 6,
+    entityType: 'ip',
+    vatMode: 'special_5',
+    vatRate: 5,
+    vatIncludedInPrice: true,
+    hasEmployees: false,
+    annualRevenueBracket: '60m_to_250m',
+    insuranceDeductionPercent: 0,
+  });
+  // VAT: 1000 * 5 / 105 = 47.62 ₽. Base tax: 900 * 6% = 54 ₽. Total = 101.62 ₽
+  assert(usn2025Res.vatRub === 47.62 && usn2025Res.taxRub === 101.62, 'Сценарий 13.2: Реформа НДС 2025 (спецставка 5% + УСН 6%)');
+
+  // 13.3. УСН Доходы минус расходы 15% с проверкой минимального налога 1%
+  const usnExpRes = calculateUnitEconomics(sampleTaxProduct, {
+    system: 'usn_income_expense',
+    ratePercent: 15,
+    entityType: 'ip',
+    vatMode: 'exempt',
+    vatRate: 0,
+    vatIncludedInPrice: true,
+    hasEmployees: false,
+    annualRevenueBracket: 'under_60m',
+    insuranceDeductionPercent: 0,
+  });
+  assert(usnExpRes.taxRub >= 9, 'Сценарий 13.3: УСН 15% с контролем мин. налога 1% (>= 9 ₽)');
+
+  // ---------------------------------------------------------------------------
+  // СЦЕНАРИЙ 14: Заявки на поставку FBO (POST /v3/supply-order/list)
+  // ---------------------------------------------------------------------------
+  console.log('\n--- Сценарий 14: Заявки на поставку FBO ---');
+  const { DEMO_OZON_SUPPLY_ORDERS } = await import('./src/services/ozonApi');
+  assert(DEMO_OZON_SUPPLY_ORDERS.length >= 3, 'Сценарий 14: Список заявок на поставку FBO содержит валидные заказы');
+  assert(DEMO_OZON_SUPPLY_ORDERS[0].supply_order_number.startsWith('SUP-'), 'Сценарий 14: Номер заявки на поставку соответствует стандарту Ozon');
+  assert(DEMO_OZON_SUPPLY_ORDERS[0].total_items_count > 0, 'Сценарий 14: Объем поставки в штуках корректно агрегирован');
+
+  // ---------------------------------------------------------------------------
+  // СЦЕНАРИЙ 15: Устойчивость при пустом каталоге первого запуска
+  // ---------------------------------------------------------------------------
+  console.log('\n--- Сценарий 15: Устойчивость при пустом каталоге первого запуска ---');
+  const { generateStoreAnalytics } = await import('./src/services/analyticsService');
+  const emptyAnalytics = generateStoreAnalytics([], '30d');
+  assert(emptyAnalytics.ordersSummary.totalOrders === 0, 'Сценарий 15: Пустой каталог возвращает 0 заказов без деления на 0');
+  assert(emptyAnalytics.financeSummary.netProfit === 0, 'Сценарий 15: Пустой каталог возвращает 0 ₽ чистой прибыли без NaN');
+
   console.log('\n====================================================');
   console.log(`TEST RESULTS: ${passedTests} PASSED, ${failedTests} FAILED`);
   console.log('====================================================');

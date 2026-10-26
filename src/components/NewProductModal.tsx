@@ -103,7 +103,7 @@ export const NewProductModal: React.FC<NewProductModalProps> = ({
             </div>
             <div>
               <h2 className="text-sm font-bold text-white">Добавить товар в юнит-экономику</h2>
-              <p className="text-xs text-slate-400">Заполните 5 изменяемых параметров — остальное рассчитается автоматически по формулам Excel</p>
+              <p className="text-xs text-slate-400">Заполните 5 изменяемых параметров — остальное рассчитается автоматически по регламенту Ozon</p>
             </div>
           </div>
           <button
@@ -289,7 +289,7 @@ export const NewProductModal: React.FC<NewProductModalProps> = ({
             >
               <span className="flex items-center gap-2 font-semibold text-xs">
                 <Settings2 className="w-4 h-4 text-slate-400" />
-                Параметры склада и налогообложения (из Excel)
+                Параметры склада и налогообложения (Регламент Ozon)
               </span>
               <span className="text-[11px] text-slate-500 underline">
                 {showAdvanced ? 'Скрыть' : 'Показать'}

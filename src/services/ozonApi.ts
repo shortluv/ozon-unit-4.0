@@ -29,7 +29,7 @@
  *    - Фиктивные проценты не подставляются, фиксируется прозрачный статус недоступности и сохраняется значение селлера
  */
 
-import { ProductUnitData, ProductDimensions, ProductSyncMeta, FieldSyncInfo } from '../types/unitEconomics';
+import { ProductUnitData, ProductDimensions, ProductSyncMeta, FieldSyncInfo, OzonSupplyOrder } from '../types/unitEconomics';
 import { getLogisticsTariff, DEFAULT_WAREHOUSE_NAME } from '../utils/calculator';
 
 export interface OzonCredentials {
@@ -1913,3 +1913,268 @@ export function calculateOzonDimensionsLogistics(
     notes,
   };
 }
+
+// ========================================================
+// ЭТАЛОННЫЕ ЗАЯВКИ НА ПОСТАВКУ FBO (ДЛЯ ТЕСТИРОВАНИЯ И ДЕМО-РЕЖИМА)
+// ========================================================
+export const DEMO_OZON_SUPPLY_ORDERS: OzonSupplyOrder[] = [
+  {
+    order_id: 1048291,
+    supply_order_number: 'SUP-2025-0482',
+    state: 'ACCEPTED_AT_SUPPLY_WAREHOUSE',
+    state_title: 'Принято на складе поставки',
+    created_at: '2025-05-18T10:30:00Z',
+    supply_warehouse_name: 'Склад FBO Тула (Кластер Центр)',
+    supply_warehouse_id: 22104,
+    total_items_count: 360,
+    crossdock_cluster: 'Центр',
+    items: [
+      { sku: 'OZN3493060723', offer_id: 'SHMP-001', name: 'Бессульфатный шампунь с кератином', quantity: 180 },
+      { sku: 'OZN3493060724', offer_id: 'MSK-002', name: 'Маска для глубокого восстановления', quantity: 120 },
+      { sku: 'OZN3493060727', offer_id: 'SCRB-005', name: 'Скраб-пилинг для кожи головы', quantity: 60 },
+    ],
+  },
+  {
+    order_id: 1052194,
+    supply_order_number: 'SUP-2025-0519',
+    state: 'ACCEPTANCE_IN_PROGRESS',
+    state_title: 'В процессе приемки',
+    created_at: '2025-05-24T14:15:00Z',
+    supply_warehouse_name: 'Склад FBO Хоругвино (Кластер Центр)',
+    supply_warehouse_id: 22105,
+    total_items_count: 240,
+    crossdock_cluster: 'Центр',
+    items: [
+      { sku: 'OZN3493060725', offer_id: 'OIL-003', name: 'Масло-флюид для кончиков волос', quantity: 140 },
+      { sku: 'OZN3493060726', offer_id: 'FLUID-004', name: 'Термозащитный спрей 15-в-1', quantity: 100 },
+    ],
+  },
+  {
+    order_id: 1059480,
+    supply_order_number: 'SUP-2025-0601',
+    state: 'TIME_SLOT_CHOSEN',
+    state_title: 'Таймслот согласован (В пути)',
+    created_at: '2025-05-27T08:00:00Z',
+    supply_warehouse_name: 'Склад FBO Санкт-Петербург (Северо-Запад)',
+    supply_warehouse_id: 22108,
+    total_items_count: 150,
+    crossdock_cluster: 'Северо-Запад',
+    items: [
+      { sku: 'OZN3493060723', offer_id: 'SHMP-001', name: 'Бессульфатный шампунь с кератином', quantity: 80 },
+      { sku: 'OZN3493060728', offer_id: 'LIP-006', name: 'Бальзам для губ восстанавливающий', quantity: 70 },
+    ],
+  },
+];
+
+/**
+ * Получить список заявок на поставку FBO через POST /v3/supply-order/list
+ * Официальный метод Ozon Seller API (Admin read only)
+ */
+export async function fetchOzonSupplyOrders(
+  credentials: OzonCredentials,
+  states?: string[]
+): Promise<{ success: boolean; supplyOrders: OzonSupplyOrder[]; error?: string }> {
+  try {
+    const res = await callOzonApi<{
+      result?: {
+        items?: Array<{
+          order_id: number;
+          supply_order_number?: string;
+          order_number?: string;
+          state: string;
+          state_name?: string;
+          created_at: string;
+          supply_warehouse?: { name: string; warehouse_id?: number };
+          total_items_count?: number;
+          items?: Array<{ sku: number | string; offer_id: string; quantity: number }>;
+        }>;
+      };
+      items?: any[];
+    }>(
+      '/v3/supply-order/list',
+      {
+        page: 1,
+        page_size: 50,
+        filter: states && states.length > 0 ? { states } : {},
+      },
+      credentials
+    );
+
+    if (res.success && res.data) {
+      const rawList = res.data.result?.items || res.data.items || [];
+      const orders: OzonSupplyOrder[] = rawList.map((item) => ({
+        order_id: item.order_id,
+        supply_order_number: item.supply_order_number || item.order_number || `ORD-${item.order_id}`,
+        state: (item.state as any) || 'ORDER_CREATED',
+        state_title: item.state_name || item.state,
+        created_at: item.created_at || new Date().toISOString(),
+        supply_warehouse_name: item.supply_warehouse?.name || 'Склад FBO Ozon',
+        supply_warehouse_id: item.supply_warehouse?.warehouse_id,
+        total_items_count: item.total_items_count || (item.items ? item.items.reduce((s: number, it: { quantity?: number }) => s + (it.quantity || 0), 0) : 0),
+        items: item.items,
+      }));
+      return { success: true, supplyOrders: orders };
+    }
+
+    return { success: false, supplyOrders: [], error: res.error || 'Не удалось получить заявки на поставку' };
+  } catch (err: any) {
+    return { success: false, supplyOrders: [], error: err.message };
+  }
+}
+
+/**
+ * Получить подробные остатки по складам FBO/FBS через POST /v3/product/info/stocks
+ */
+export async function fetchOzonWarehouseStocks(
+  credentials: OzonCredentials,
+  limit: number = 100
+): Promise<{
+  success: boolean;
+  stocks: Array<{
+    product_id: number;
+    offer_id: string;
+    fbo_present: number;
+    fbo_reserved: number;
+    fbs_present: number;
+    fbs_reserved: number;
+  }>;
+  error?: string;
+}> {
+  try {
+    const res = await callOzonApi<{
+      result?: {
+        items?: Array<{
+          product_id: number;
+          offer_id: string;
+          stocks?: Array<{
+            type: 'fbo' | 'fbs';
+            present: number;
+            reserved: number;
+          }>;
+        }>;
+      };
+      items?: any[];
+    }>(
+      '/v3/product/info/stocks',
+      {
+        filter: { visibility: 'ALL' },
+        limit,
+      },
+      credentials
+    );
+
+    if (res.success && res.data) {
+      const rawItems: any[] = res.data.result?.items || res.data.items || [];
+      const formatted = rawItems.map((item: any) => {
+        let fbo_present = 0;
+        let fbo_reserved = 0;
+        let fbs_present = 0;
+        let fbs_reserved = 0;
+        if (Array.isArray(item.stocks)) {
+          item.stocks.forEach((st: { type: string; present?: number; reserved?: number }) => {
+            if (st.type === 'fbo') {
+              fbo_present += st.present || 0;
+              fbo_reserved += st.reserved || 0;
+            } else if (st.type === 'fbs') {
+              fbs_present += st.present || 0;
+              fbs_reserved += st.reserved || 0;
+            }
+          });
+        }
+        return {
+          product_id: item.product_id,
+          offer_id: item.offer_id,
+          fbo_present,
+          fbo_reserved,
+          fbs_present,
+          fbs_reserved,
+        };
+      });
+      return { success: true, stocks: formatted };
+    }
+
+    return { success: false, stocks: [], error: res.error || 'Не удалось получить остатки' };
+  } catch (err: any) {
+    return { success: false, stocks: [], error: err.message };
+  }
+}
+
+/**
+ * Получить список финансовых транзакций Ozon через POST /v3/finance/transaction/list
+ */
+export async function fetchOzonTransactions(
+  credentials: OzonCredentials,
+  dateFrom: string,
+  dateTo: string
+): Promise<{
+  success: boolean;
+  transactions: Array<{
+    operation_id: number;
+    operation_type: string;
+    operation_date: string;
+    operation_type_name: string;
+    delivery_charge: number;
+    return_delivery_charge: number;
+    accruals_for_sale: number;
+    sale_commission: number;
+    amount: number;
+    type: string;
+  }>;
+  error?: string;
+}> {
+  try {
+    const res = await callOzonApi<{
+      result?: {
+        operations?: Array<{
+          operation_id: number;
+          operation_type: string;
+          operation_date: string;
+          operation_type_name: string;
+          delivery_charge?: number;
+          return_delivery_charge?: number;
+          accruals_for_sale?: number;
+          sale_commission?: number;
+          amount?: number;
+          type?: string;
+        }>;
+      };
+      operations?: any[];
+    }>(
+      '/v3/finance/transaction/list',
+      {
+        filter: {
+          date: {
+            from: dateFrom,
+            to: dateTo,
+          },
+          transaction_type: 'all',
+        },
+        page: 1,
+        page_size: 100,
+      },
+      credentials
+    );
+
+    if (res.success && res.data) {
+      const ops = res.data.result?.operations || res.data.operations || [];
+      const txs = ops.map((op) => ({
+        operation_id: op.operation_id,
+        operation_type: op.operation_type,
+        operation_date: op.operation_date,
+        operation_type_name: op.operation_type_name || op.operation_type,
+        delivery_charge: op.delivery_charge || 0,
+        return_delivery_charge: op.return_delivery_charge || 0,
+        accruals_for_sale: op.accruals_for_sale || 0,
+        sale_commission: op.sale_commission || 0,
+        amount: op.amount || 0,
+        type: op.type || 'operation',
+      }));
+      return { success: true, transactions: txs };
+    }
+
+    return { success: false, transactions: [], error: res.error || 'Не удалось получить транзакции' };
+  } catch (err: any) {
+    return { success: false, transactions: [], error: err.message };
+  }
+}
+

@@ -503,7 +503,7 @@ export const SingleCalculator: React.FC<SingleCalculatorProps> = ({
             >
               <div className="flex items-center gap-2 font-semibold">
                 <Settings2 className="w-4 h-4 text-indigo-400" />
-                <span>Тарифные константы маркетплейса (из Excel таблицы)</span>
+                <span>Тарифные константы маркетплейса (Регламент Ozon)</span>
               </div>
               <span className="text-[11px] text-slate-400 flex items-center gap-1 hover:text-indigo-300">
                 {showAdvanced ? 'Свернуть' : 'Развернуть параметры'}

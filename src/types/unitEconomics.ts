@@ -144,5 +144,81 @@ export interface UnitEconomicsResult {
   monthlyTotalExpenses: number;
   monthlyNetProfit: number;
   
+  // Детализация налогового режима РФ (УСН, ОСНО, АУСН, НПД, НДС 2025/2026)
+  taxSystemLabel?: string;
+  taxRubBase?: number; // Налог УСН / прибыль
+  vatRub?: number; // Сумма НДС (если применимо)
+  taxExplanation?: string;
+
   status: 'profitable' | 'marginal' | 'loss';
 }
+
+// ========================================================
+// НАЛОГОВЫЕ РЕЖИМЫ РФ И РЕФОРМА НДС 2025/2026
+// ========================================================
+export type TaxSystemType =
+  | 'usn_income' // УСН «Доходы» (6%, 11%, либо льготная 1-5%)
+  | 'usn_income_expense' // УСН «Доходы минус расходы» (15%, либо льготная 5-15%, мин. налог 1%)
+  | 'osno' // ОСНО (Налог на прибыль 20% + НДС 20%)
+  | 'ausn' // АУСН (Автоматизированная УСН: 8% доходы или 20% доходы-расходы)
+  | 'npd'; // НПД (Самозанятый: 6% при продажах через маркетплейс юрлицам)
+
+export type BusinessEntityType = 'ip' | 'ooo' | 'self_employed';
+
+export type VatRate = 0 | 5 | 7 | 10 | 20;
+
+export type VatMode =
+  | 'exempt' // Освобождение от НДС (ст. 145 НК РФ: доход до 60 млн ₽)
+  | 'special_5' // Спецставка НДС 5% (реформа 2025: доход от 60 до 250 млн ₽, без вычета входящего НДС)
+  | 'special_7' // Спецставка НДС 7% (реформа 2025: доход от 250 до 450 млн ₽, без вычета входящего НДС)
+  | 'standard_20' // Общеустановленная ставка НДС 20% (с правом на вычет входного НДС)
+  | 'preferential_10'; // Льготная ставка 10% (детские товары, продукты питания, медтовары)
+
+export interface TaxRegimeConfig {
+  system: TaxSystemType;
+  ratePercent: number; // Основная ставка налога (6, 11, 15, 20, 8)
+  entityType: BusinessEntityType; // ИП, ООО, Самозанятый
+  vatMode: VatMode;
+  vatRate: VatRate;
+  vatIncludedInPrice: boolean; // Включен ли НДС в розничную цену
+  hasEmployees: boolean; // Влияет на уменьшение налога за счет страховых взносов
+  annualRevenueBracket: 'under_60m' | '60m_to_250m' | '250m_to_450m' | 'over_450m';
+  insuranceDeductionPercent: number; // 0..100% уменьшения УСН Доходы на взносы ИП
+  region?: string;
+  notes?: string;
+}
+
+// ========================================================
+// ЗАЯВКИ НА ПОСТАВКУ FBO (POST /v3/supply-order/list)
+// ========================================================
+export type OzonSupplyOrderStatus =
+  | 'ORDER_CREATED' // Заявка создана
+  | 'DRAFT' // Черновик
+  | 'TIME_SLOT_CHOSEN' // Время выбрано
+  | 'TIMESLOT_BOOKED' // Таймслот забронирован
+  | 'ACCEPTANCE_IN_PROGRESS' // В процессе приемки
+  | 'ACCEPTED_AT_SUPPLY_WAREHOUSE' // Принято на складе поставки
+  | 'COMPLETED' // Приемка завершена
+  | 'CANCELLED'; // Отменена
+
+export interface OzonSupplyOrderItem {
+  sku: number | string;
+  offer_id: string;
+  name?: string;
+  quantity: number;
+  total_box_count?: number;
+}
+
+export interface OzonSupplyOrder {
+  order_id: number;
+  supply_order_number: string;
+  state: OzonSupplyOrderStatus;
+  state_title: string;
+  created_at: string;
+  supply_warehouse_name: string;
+  supply_warehouse_id?: number;
+  total_items_count: number;
+  items?: OzonSupplyOrderItem[];
+  crossdock_cluster?: string;
+}
+

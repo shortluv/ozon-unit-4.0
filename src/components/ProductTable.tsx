@@ -778,7 +778,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
 
                 {/* 2. Цена реализации для налога */}
                 <th className="py-3 px-3 font-bold text-cyan-300 whitespace-nowrap text-right bg-cyan-500/[0.05] border-r border-cyan-500/10">
-                  <span title="Цена реализации товара — база расчета налога УСН 11% (колонка E в Excel файле)">
+                  <span title="Цена реализации товара — база расчета налога УСН (фактическая цена со скидкой продавца)">
                     2. Цена реализации (₽)
                   </span>
                 </th>
@@ -991,7 +991,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                               value={prod.taxPrice ?? prod.retailPrice}
                               onChange={(e) => handleTaxPriceChange(prod, Number(e.target.value))}
                               className="w-24 pl-2 pr-5 py-1 text-right font-mono tabular-nums text-xs font-semibold bg-[#080c16] border border-cyan-500/40 hover:border-cyan-500 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 rounded-lg text-cyan-300 focus:outline-none transition-all"
-                              title="Цена реализации для налога (колонка E в Excel, база для УСН)"
+                              title="Цена реализации для налога (цена со скидкой продавца, база для УСН)"
                             />
                             <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-cyan-400/70 pointer-events-none">
                               ₽

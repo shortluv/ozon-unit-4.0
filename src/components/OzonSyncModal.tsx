@@ -668,7 +668,7 @@ export const OzonSyncModal: React.FC<OzonSyncModalProps> = ({
                         )}
                       </select>
                       <p className="text-[10px] text-slate-500 mt-1">
-                        По умолчанию: {DEFAULT_WAREHOUSE_NAME} (из вашего Excel файла)
+                        По умолчанию: {DEFAULT_WAREHOUSE_NAME} (Кластер Центр)
                       </p>
                     </div>
 
@@ -708,7 +708,7 @@ export const OzonSyncModal: React.FC<OzonSyncModalProps> = ({
                         <option value={0.85}>85% от розничной цены</option>
                       </select>
                       <p className="text-[10px] text-cyan-400/80 mt-1">
-                        Колонка E в Excel, от которой рассчитывается налог 11%
+                        Фактическая цена реализации Ozon со скидкой продавца (база налога УСН)
                       </p>
                     </div>
                   </div>
